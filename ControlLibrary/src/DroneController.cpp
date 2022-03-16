@@ -1,6 +1,6 @@
 #include "../include/ControlLibrary/DroneController.h"
 
-
+//Github Test
 void DroneControl::state_cb(const mavros_msgs::State::ConstPtr& msg){
     current_state = *msg;
 }
