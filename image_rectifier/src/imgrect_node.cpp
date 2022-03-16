@@ -25,7 +25,7 @@ class ImageRectifier{
     cv::Mat map1;
     cv::Mat map2;
     cv::Mat undistort;
-    
+
     std::string Substring;
     std::string Pubstring;
     image_transport::Subscriber image_sub_;
@@ -40,7 +40,7 @@ class ImageRectifier{
     
 
 public:
-    sensor_msgs::Image img_msg; // >> message to be sent
+    //sensor_msgs::Image img_msg; // >> message to be sent
     ImageRectifier(std::string CameraSelect, ros::NodeHandle n)
      : it_(n){
         Substring = "/camera/fisheye"+CameraSelect+"/image_raw";
@@ -71,9 +71,9 @@ public:
     distortionCoeffs.at<double>(0,2) = -0.030459459871053696;
     distortionCoeffs.at<double>(0,3) = 0.0038244719617068768;
 
-   //cv::Size size = {Input.cols, Input.rows};
     cv::Size size = {848, 800};
     cv::fisheye::initUndistortRectifyMap(cameraMatrix, distortionCoeffs, cv::Mat::eye(3,3, cv::DataType<double>::type), cameraMatrix, size, CV_16SC2, map1, map2);
+
 
     }
 
@@ -97,8 +97,7 @@ void imageCb(const sensor_msgs::ImageConstPtr& msg){
     }
 
     Input = cv_ptr->image;
-    cv::Size size = {Input.cols, Input.rows};
-    ROS_INFO_STREAM(size);
+    //cv::Size size = {Input.cols, Input.rows};
     //cv::fisheye::initUndistortRectifyMap(cameraMatrix, distortionCoeffs, cv::Mat::eye(3,3, cv::DataType<double>::type), cameraMatrix, size, CV_16SC2, map1, map2);
     cv::remap(Input, Output, map1, map2, cv::INTER_LINEAR, CV_HAL_BORDER_CONSTANT);
 
@@ -114,9 +113,8 @@ void imageCb(const sensor_msgs::ImageConstPtr& msg){
 
 
 int main(int argc, char **argv){
-    ros::init(argc, argv, "image_rectifier");  
-    ros::NodeHandle n;
-    ros::Rate rate(30);
+    ros::init(argc, argv, "image_rectifier");
+    ros::NodeHandle n;  
     ImageRectifier ic1("1", n);
     ImageRectifier ic2("2", n);
     ros::spin();

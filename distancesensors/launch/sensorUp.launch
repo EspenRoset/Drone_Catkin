@@ -1,0 +1,3 @@
+<launch>
+<node name="sensorUp_node" pkg="DistanceSensors" type="SensorUp.py" output="screen"></node>
+</launch>
