@@ -21,7 +21,18 @@
 
 class DroneControl{
     private:
-        std::vector<float> collision_detection;
+        int state;
+        const int Startup = 0;
+        const int Takeoff = 1;
+        const int Flying = 2;
+        const int Landing = 3;
+        const int Landed = 4;
+        const int AvoidObstacle = 5;
+
+        bool Obstacle_detected = false;
+        bool Roof_limit = false;
+        bool Floor_limit = false;
+        std::vector<float> Obstacle_position;
 
         ros::Subscriber state_sub;
         ros::Subscriber pos_sub;
@@ -55,17 +66,11 @@ class DroneControl{
         void DroneLand();
 
     public:
-        const int Startup = 0;
-        const int Takeoff = 1;
-        const int Flying = 2;
-        const int Landing = 3;
-        const int Landed = 4;
-        int state;
-
         float TakeoffAltitude = 1.0; // meter
         bool InitiateTakeoff = false;
         bool ArmDrone = false;
         bool InitiateLanding = false;
+
         std::condition_variable cv;
         mavros_msgs::PositionTarget InputTargetPosition;
 
@@ -91,7 +96,7 @@ class DroneControl{
         landing_client = n.serviceClient<mavros_msgs::CommandTOL>("mavros/cmd/land");
 
         TargetPosition.coordinate_frame = mavros_msgs::PositionTarget::FRAME_BODY_NED; // Body frame
-        TargetPosition.type_mask = 1024; //Ignore Yaw, use Yaw_rate
+        TargetPosition.type_mask = 1024; //Ignore Yaw angle, use Yaw_rate
 
         RunThread = std::thread(&DroneControl::RunDrone, this);
         ROS_INFO("Drone initialized");
@@ -100,6 +105,7 @@ class DroneControl{
     void state_cb(const mavros_msgs::State::ConstPtr& msg);
     void pose_cb(const nav_msgs::Odometry::ConstPtr& msg);
     void collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg);
+    void check_height();
     void RunDrone();
 };
 

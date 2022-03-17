@@ -11,21 +11,43 @@
 #include "ControlLibrary/ControllerConverter.h"
 #include "ControlLibrary/DroneController.h"
 #include <tf/transform_datatypes.h>
+#include <std_msgs/Float32MultiArray.h>
+
+
+ros::Publisher test;
+std_msgs::Float32MultiArray testArray;
+std::thread changeVectorThread;
+std::vector<float> goVector = {0.0, 0.0, 0.0, 0.0, 0.0};
+std::vector<float> stopVector = {1.0, 100.0, 100.0};
+
+
+void WaitThenChangeVector(){ // Can be used for testing avoidance system
+  testArray.data = goVector;
+  ROS_INFO("Waiting to change vector");
+  std::this_thread::sleep_for(std::chrono::seconds(60));
+  testArray.data = stopVector;
+  ROS_INFO("Changed vector");
+  std::this_thread::sleep_for(std::chrono::seconds(10));
+  testArray.data = goVector;
+  ROS_INFO("Changed vector");
+}
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "offb_node");
   ros::NodeHandle nh;
+  test = nh.advertise<std_msgs::Float32MultiArray>("object_detection", 1);
   // the setpoint publishing rate MUST be faster than 2Hz
   ros::Rate rate(20.0);
 
   ControllerConverter Controller(nh, rate);
   DroneControl Drone(nh, rate);
 
-    Drone.ArmDrone = false;;
-    //Dtest.TakeoffAltitude = 2.5;
-    Drone.InitiateTakeoff = false;
+  Drone.ArmDrone = false;
+  //Dtest.TakeoffAltitude = 2.5;
+  Drone.InitiateTakeoff = false;
 
+ // changeVectorThread = std::thread(&WaitThenChangeVector); Can be used for testing avoidance system
     while(ros::ok()){
         if (Controller.Arm){ // Arm when controller input says
             Drone.ArmDrone = true;
@@ -44,6 +66,7 @@ int main(int argc, char** argv)
             ROS_INFO_STREAM("Sent landing command");
         }
 
+        //test.publish(testArray); Can be used for testing avoidance system
         Drone.InputTargetPosition = Controller.Target; // Send other input from controller to drone
         ros::spinOnce();
         rate.sleep();

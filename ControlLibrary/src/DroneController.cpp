@@ -10,7 +10,10 @@ void DroneControl::pose_cb(const nav_msgs::Odometry::ConstPtr& msg){
 }
 
 void DroneControl::collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg){
-    
+    Obstacle_detected = static_cast<int>(msg->data[2]);
+    Roof_limit = static_cast<int>(msg->data[3]);
+    Floor_limit = static_cast<int>(msg->data[4]);
+    Obstacle_position = {msg->data[0], msg->data[1], msg->data[3], msg->data[4]}; // X, Y, to high, too low
 }
 
 void DroneControl::RunDrone(){
@@ -38,7 +41,7 @@ void DroneControl::RunDrone(){
 
             break;
         case 1 /*TakeOff*/: // Check OFFBOARD and arm, Take off to flight altitude
-                if ((current_state.mode == "OFFBOARD") && (current_state.armed)){
+                if ((current_state.mode == "OFFBOARD") && (current_state.armed) && !Roof_limit){
                     DroneControl::DroneTakeoff(TakeoffAltitude); // Takes of and changes state to flying
                 } else{
                     state = Startup;
@@ -48,6 +51,8 @@ void DroneControl::RunDrone(){
                 TargetPosition = InputTargetPosition;
                 if (InitiateLanding){
                     state = Landing;
+                } if (Obstacle_detected || Roof_limit || Floor_limit){
+                    state = AvoidObstacle;
                 }
             break;
         case 3 /*Landing*/: // Land quad
@@ -62,16 +67,37 @@ void DroneControl::RunDrone(){
                 }
                 state = Takeoff;
             break;
+        case 5 /*Avoid Obstacle*/: // Limit movement to avoid crashing
+                // Get input from Controller
+                TargetPosition = InputTargetPosition;
+                // Limit Movement
+                if (Obstacle_detected){ // Obstacle,  limit x velocity to zero
+                    TargetPosition.velocity.x = 0;
+                }
+                if (Roof_limit){ // Roof too close, limit z velocity to negative
+                    if (TargetPosition.velocity.z > 0){
+                        TargetPosition.velocity.z = 0;
+                    }
+                }
+                if (Floor_limit){ // Floor too close, limit z velocity to positive
+                    if (TargetPosition.velocity.z > 0){
+                        TargetPosition.velocity.z = 0;
+                    }
+                }
+                if (!Obstacle_detected && !Roof_limit && !Floor_limit){
+                    state = Flying;
+                }
+            break;
         default: // Maybe do something
             break;
         }
         pos_pub.publish(TargetPosition);
-        ROS_INFO_STREAM("Targetposition published");
+        //ROS_INFO_STREAM("Targetposition published");
         rate_->sleep();
     }
 }
 
-void DroneControl::WaitForFCUConnection(){
+void DroneControl::WaitForFCUConnection(){ // Wait untiul connection with PX4 is established
     while (ros::ok() && !current_state.connected)
             {
                 ros::spinOnce();
@@ -81,7 +107,7 @@ void DroneControl::WaitForFCUConnection(){
 
 }
 
-void DroneControl::SendNWaipoints(int n){
+void DroneControl::SendNWaipoints(int n){ // Send n number of waypoints (used to be able to change mode to offboard)
      for (int i = n; ros::ok() && i > 0; --i)
   {
     pos_pub.publish(TargetPosition);
@@ -90,7 +116,7 @@ void DroneControl::SendNWaipoints(int n){
   }
 }
 
-void DroneControl::SetPX4Mode(std::string Mode){
+void DroneControl::SetPX4Mode(std::string Mode){ // set given mode on px4
     offb_set_mode.request.custom_mode = Mode;
     while(ros::ok() && current_state.mode != Mode){
         if (current_state.mode != Mode && (ros::Time::now() - last_request > ros::Duration(5.0)))
@@ -105,7 +131,7 @@ void DroneControl::SetPX4Mode(std::string Mode){
 
 }
 
-void DroneControl::PX4Arm(){
+void DroneControl::PX4Arm(){ // Arm quad and reset arm bool
     while(ros::ok() && !current_state.armed){
         if (!current_state.armed && (ros::Time::now() - last_request > ros::Duration(5.0)))
       {
@@ -119,7 +145,7 @@ void DroneControl::PX4Arm(){
     ArmDrone = false;
 }
 
-void DroneControl::DroneTakeoff(float altitude){
+void DroneControl::DroneTakeoff(float altitude){ // Take off the drone and change mode to Flying
     if(ros::ok() && (current_position.pose.pose.position.z < altitude)){
         ROS_INFO_STREAM("Initiating Takeoff");
         TargetPosition.velocity.z = 0.5;
@@ -130,7 +156,7 @@ void DroneControl::DroneTakeoff(float altitude){
     }
 }
 
-void DroneControl::DroneLand(){
+void DroneControl::DroneLand(){ // Land the drone and change mode to Startup
     while (!(landing_client.call(land_cmd) &&
             land_cmd.response.success) ){
               ROS_INFO("trying to land");
@@ -141,4 +167,8 @@ void DroneControl::DroneLand(){
         InitiateLanding = false;
         state = Startup;         
     }
+}
+
+void DroneControl::check_height(){
+
 }
