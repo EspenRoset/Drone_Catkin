@@ -2,6 +2,7 @@
 #define DRONECONTROLLER_H
 #include <ros/ros.h>
 #include "mavros_msgs/PositionTarget.h"
+#include "std_msgs/Float32MultiArray.h"
 #include "nav_msgs/Odometry.h"
 #include "sensor_msgs/Joy.h"
 #include <mavros_msgs/State.h>
@@ -20,9 +21,12 @@
 
 class DroneControl{
     private:
+        std::vector<float> collision_detection;
+
         ros::Subscriber state_sub;
         ros::Subscriber pos_sub;
         ros::Publisher pos_pub;
+        ros::Subscriber collision_sub;
         ros::ServiceClient arming_client;
         ros::ServiceClient set_mode_client;
         ros::ServiceClient landing_client;
@@ -81,6 +85,7 @@ class DroneControl{
         state_sub = n.subscribe<mavros_msgs::State>("mavros/state", 10, &DroneControl::state_cb, this);
         pos_sub = n.subscribe<nav_msgs::Odometry>("mavros/local_position/odom", 10, &DroneControl::pose_cb, this);
         pos_pub = n.advertise<mavros_msgs::PositionTarget>("/mavros/setpoint_raw/local", 10);
+        collision_sub = n.subscribe<std_msgs::Float32MultiArray>("object_detection", 10, &DroneControl::collision_cb, this);
         arming_client = n.serviceClient<mavros_msgs::CommandBool>("mavros/cmd/arming");
         set_mode_client = n.serviceClient<mavros_msgs::SetMode>("mavros/set_mode");
         landing_client = n.serviceClient<mavros_msgs::CommandTOL>("mavros/cmd/land");
@@ -94,6 +99,7 @@ class DroneControl{
 
     void state_cb(const mavros_msgs::State::ConstPtr& msg);
     void pose_cb(const nav_msgs::Odometry::ConstPtr& msg);
+    void collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg);
     void RunDrone();
 };
 

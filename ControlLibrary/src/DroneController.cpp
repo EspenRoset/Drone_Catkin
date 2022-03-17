@@ -9,6 +9,10 @@ void DroneControl::pose_cb(const nav_msgs::Odometry::ConstPtr& msg){
     current_position = *msg;
 }
 
+void DroneControl::collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg){
+    
+}
+
 void DroneControl::RunDrone(){
     while(true){
         switch (state)
