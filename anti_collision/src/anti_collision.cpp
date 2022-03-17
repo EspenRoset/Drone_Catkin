@@ -6,6 +6,7 @@ bool compareContourAreas ( std::vector<cv::Point> contour1, std::vector<cv::Poin
     double j = fabs( cv::contourArea(cv::Mat(contour2)) );
     return ( i > j );
 }
+// Testing
 
 cv::Mat replaceInf(cv::Mat &m){
     int infCounter = 0;
