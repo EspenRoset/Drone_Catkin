@@ -78,7 +78,7 @@ void DroneControl::RunDrone(){
             break;
         }
         pos_pub.publish(TargetPosition);
-        ROS_INFO_STREAM("Targetposition published");
+        //ROS_INFO_STREAM("Targetposition published");
         rate_->sleep();
     }
 }
