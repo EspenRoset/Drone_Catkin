@@ -17,7 +17,7 @@
 ros::Publisher test;
 std_msgs::Float32MultiArray testArray;
 std::thread changeVectorThread;
-std::vector<float> goVector = {0.0, 0.0, 0.0};
+std::vector<float> goVector = {0.0, 0.0, 0.0, 0.0, 0.0};
 std::vector<float> stopVector = {1.0, 100.0, 100.0};
 
 
