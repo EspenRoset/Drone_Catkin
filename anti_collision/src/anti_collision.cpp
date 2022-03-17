@@ -117,7 +117,9 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
 
             std::vector<std::vector<cv::Point>> contours;
             std::vector<cv::Vec4i> hierarchy;
-
+            data[0] = 0;
+            data[1] = 0;
+            data[2] = 0;
             // Check if a significantly large obstacle is present and filter out smaller noisy regions
             if (s > 0.10*img_area)
             {
@@ -145,7 +147,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
                     data[0] = boxX;
                     data[1] = boxY;
                     data[2] = 1.0f;
-                    detectedObject.data = data;
+                    
                     
 
                     // finding average depth of region represented by the largest contour
@@ -172,24 +174,21 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
                     //ROS_INFO("STRANGER DANGER");
                 }
             }
-            else
-            {
+            //else
+            //{
                 // Printing SAFE if no obstacle is closer than the safe distance
                 //cv::putText(output_canvas, "SAFE!", cv::Point2f(200,200),1,2,cv::Scalar(0,255,0),2,2);
-                data[0] = 0;
-                data[1] = 0;
-                data[2] = 0;
-                detectedObject.data = data;
-            }
-
+                
+            //}
+            
             verticalCheck(data);
-
+            detectedObject.data = data;
             // Displaying the output of the obstacle avoidance system
             
             //cv::imshow("mask", disparity);
             //cv::imshow("mask2", mask2);
             //cv::imshow("output_canvas",output_canvas);
-            //pub.publish(detectedObject);
+            pub.publish(detectedObject);
             //cv::waitKey(1);
             ROS_INFO("Vector:");
             ROS_INFO_STREAM(data[0]);

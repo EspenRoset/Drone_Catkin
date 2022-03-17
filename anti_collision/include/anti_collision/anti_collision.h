@@ -42,10 +42,10 @@ class analysis
     float minDistRoof = 1500; // Minimum distance above drone  (mm)
     float minAltitude = 500;  // Minimum distance bellow drone (mm)
     float depth_thresh = 60;  // Threshold for SAFE distance (cm)
-    
+
     analysis(ros::NodeHandle& nh){
         image_transport::ImageTransport it(nh);
-        sub = it.subscribe("/disparity",1 , &analysis::gridview, this);
+        sub = it.subscribe("/disparity",1 , &analysis::detectobject, this);
         //subClean = it.subscribe("/camera/fisheye1/image_raw/rectified",1 , &analysis::updateFrame1, this);
         subSensorDown = nh.subscribe("/distance_down", 1, &analysis::sensordown_update, this);
         subSensorUp = nh.subscribe("/distance_up", 1, &analysis::sensorup_update, this);
