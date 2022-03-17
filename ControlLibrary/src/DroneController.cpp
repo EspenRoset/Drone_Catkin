@@ -10,7 +10,8 @@ void DroneControl::pose_cb(const nav_msgs::Odometry::ConstPtr& msg){
 }
 
 void DroneControl::collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg){
-    
+    Obstacle_detected = static_cast<int>(msg->data[2]);
+    Obstacle_position = {msg->data[0], msg->data[1]};
 }
 
 void DroneControl::RunDrone(){
@@ -48,6 +49,8 @@ void DroneControl::RunDrone(){
                 TargetPosition = InputTargetPosition;
                 if (InitiateLanding){
                     state = Landing;
+                } if (Obstacle_detected){
+                    state = AvoidObstacle;
                 }
             break;
         case 3 /*Landing*/: // Land quad
@@ -61,6 +64,15 @@ void DroneControl::RunDrone(){
                 cv.wait(lk, [&]{return InitiateTakeoff;});
                 }
                 state = Takeoff;
+            break;
+        case 5 /*Avoid Obstacle*/: // Limit movement crashing is avoided
+                // Get input from Controller
+                TargetPosition = InputTargetPosition;
+                // Limit Movement
+                TargetPosition.velocity.x = 0;
+                if (!Obstacle_detected){
+                    state = Flying;
+                }
             break;
         default: // Maybe do something
             break;

@@ -21,7 +21,16 @@
 
 class DroneControl{
     private:
-        std::vector<float> collision_detection;
+        int state;
+        const int Startup = 0;
+        const int Takeoff = 1;
+        const int Flying = 2;
+        const int Landing = 3;
+        const int Landed = 4;
+        const int AvoidObstacle = 5;
+
+        bool Obstacle_detected = false;
+        std::vector<float> Obstacle_position;
 
         ros::Subscriber state_sub;
         ros::Subscriber pos_sub;
@@ -55,17 +64,11 @@ class DroneControl{
         void DroneLand();
 
     public:
-        const int Startup = 0;
-        const int Takeoff = 1;
-        const int Flying = 2;
-        const int Landing = 3;
-        const int Landed = 4;
-        int state;
-
         float TakeoffAltitude = 1.0; // meter
         bool InitiateTakeoff = false;
         bool ArmDrone = false;
         bool InitiateLanding = false;
+
         std::condition_variable cv;
         mavros_msgs::PositionTarget InputTargetPosition;
 
