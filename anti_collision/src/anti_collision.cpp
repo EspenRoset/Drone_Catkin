@@ -145,6 +145,12 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
 
                     // Finding the bounding rectangle for the largest contour
                     box = cv::boundingRect(cnt);
+                    
+                    float boxX = box.x + box.width/2;
+                    float boxY = box.y + box.height/2;
+                    data = {boxX, boxY , 1.0};
+                    detectedObject.data = data;
+                    
 
                     // finding average depth of region represented by the largest contour
                     mask2 = mask*0;
@@ -157,7 +163,6 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
                     //cv::Scalar mean2 = cv::mean(depth_map, mask2);
                     double minVal; 
                     double maxVal;
-
 
                     // Printing the warning text with object distance
                     char text[10];
@@ -175,7 +180,8 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             {
                 // Printing SAFE if no obstacle is closer than the safe distance
                 cv::putText(output_canvas, "SAFE!", cv::Point2f(200,200),1,2,cv::Scalar(0,255,0),2,2);
-                ROS_INFO("SAFE1");
+                data = {0,0,0};
+                detectedObject.data = data;
             }
 
 
@@ -184,7 +190,13 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::imshow("mask", disparity);
             //cv::imshow("mask2", mask2);
             cv::imshow("output_canvas",output_canvas);
+            pub.publish(detectedObject);
             cv::waitKey(1);
+            ROS_INFO("Vector:");
+            ROS_INFO_STREAM(data[0]);
+            ROS_INFO_STREAM(data[1]);
+            ROS_INFO_STREAM(data[2]);
+        
 
 
             

@@ -11,6 +11,8 @@
 #include <iostream>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
+#include <std_msgs/Float32MultiArray.h>
+#include <vector>
 
 
 void sayHello();
@@ -26,6 +28,9 @@ class analysis
     image_transport::Subscriber subClean;
     image_transport::Subscriber subClean2;
     image_transport::Subscriber subGrid;
+    ros::Publisher pub;
+    std_msgs::Float32MultiArray detectedObject;
+    std::vector<float> data;
 
 
     public:
@@ -33,10 +38,7 @@ class analysis
         image_transport::ImageTransport it(nh);
         sub = it.subscribe("/disparity",1 , &analysis::gridview, this);
         subClean = it.subscribe("/camera/fisheye1/image_raw/rectified",1 , &analysis::updateFrame1, this);
-        //subClean2 = it.subscribe("/camera/fisheye2/image_raw/rectified",1 , &analysis::displayROI, this);
-
-        //subGrid = it.subscribe("/disparity",1, &analysis::gridview, this);
-        ROS_INFO("Class built");      
+        pub = nh.advertise<std_msgs::Float32MultiArray>("object_detection", 1);  
     }
 
     void detectobject(const sensor_msgs::ImageConstPtr& msg);
