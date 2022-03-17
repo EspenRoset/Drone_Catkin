@@ -6,27 +6,6 @@ bool compareContourAreas ( std::vector<cv::Point> contour1, std::vector<cv::Poin
     double j = fabs( cv::contourArea(cv::Mat(contour2)) );
     return ( i > j );
 }
-// Testing
-
-cv::Mat replaceInf(cv::Mat &m){
-    int infCounter = 0;
-    cv::Mat okTest = m.clone();
-    for(int i = 0; i< m.rows; i++)
-    {
-        for(int j=0; j<m.cols; j++)
-        {
-            if(std::isinf(m.at<float>(i,j)))
-            {
-                okTest.at<float>(i,j) = 60.0;
-                infCounter++;
-            }else{
-                okTest.at<float>(i,j) = m.at<float>(i,j);
-            }
-        }
-    }
-    ROS_INFO_STREAM(infCounter);
-    return okTest;
-}
 
 void analysis::updateFrame1(const sensor_msgs::ImageConstPtr& msg)
 {
@@ -37,37 +16,37 @@ void analysis::updateFrame1(const sensor_msgs::ImageConstPtr& msg)
     this->output = img;
 }
 
+
+void analysis::sensorup_update(const std_msgs::String &msg)
+{
+    sensorUp = std::stof(msg.data);
+}
+
+void analysis::sensordown_update(const std_msgs::String &msg)
+{
+    sensorDown = std::stof(msg.data);
+}
+
+
 void analysis::gridview(const sensor_msgs::ImageConstPtr& msg)
 {
     cv::Mat disparity = cv_bridge::toCvShare(msg, "mono8")->image;
-    //cv::cvtColor(disparity, disparity, cv::COLOR_BGR2GRAY);
     disparity.convertTo(disparity,CV_8UC1,1.0);
-
-    int N = 100;
+    int N = 60;
     int winCols = disparity.cols;
     int winRows = disparity.rows;
-
     cv::Mat gridView(winRows,winCols, CV_8UC1);
-    
+
     for (int r = 0; r < disparity.rows; r += N)
     for (int c = 0; c < disparity.cols; c += N)
     {
         cv::Mat tile = disparity(cv::Range(r, cv::min(r + N, disparity.rows)),
-                     cv::Range(c, cv::min(c + N, disparity.cols)));//no data copying here
-        //cv::Mat tileCopy = img(cv::Range(r, min(r + N, img.rows)),
-                     //cv::Range(c, min(c + N, img.cols))).clone();//with data copying
+        cv::Range(c, cv::min(c + N, disparity.cols)));//no data copying here
 
         //tile can be smaller than NxN if image size is not a factor of N
         gridView(cv::Range(r, cv::min(r + N, disparity.rows)),cv::Range(c, cv::min(c + N, disparity.cols))) = cv::mean(tile);
+        pubGrid.publish((cv_bridge::CvImage(std_msgs::Header(), "mono8", gridView).toImageMsg()));
     }
-    cv::imshow("gridview", gridView);
-    cv::waitKey(1);
-    double minVal; 
-    double maxVal; 
-    cv::Point minLoc; 
-    cv::Point maxLoc;
-    minMaxLoc( gridView, &minVal, &maxVal, &minLoc, &maxLoc );
-    ROS_INFO_STREAM(maxVal);
 }
 
 void analysis::Calibration(const sensor_msgs::ImageConstPtr& msg){
@@ -92,23 +71,37 @@ void analysis::Calibration(const sensor_msgs::ImageConstPtr& msg){
     cv::Scalar meanValue = cv::mean(test);
     double distance = 6646.77f/meanValue[0];
     distance +=  21.669;
+    ROS_INFO("-----");
+    ROS_INFO("Distance:");
     ROS_INFO_STREAM(distance);
+    ROS_INFO("-----");
+    ROS_INFO("Max:");
     ROS_INFO_STREAM(maxVal);
     cv::waitKey(1);
 }
 
+
+void analysis::verticalCheck(std::vector<float>& data)
+{
+    if (sensorUp>minDistRoof){
+        data[3] = 0;
+    }else{
+        data[3] = 1;
+    }
+    if (sensorDown>minAltitude){
+        data[4] = 0;
+    }else{
+        data[4] = 1;
+    }
+}
 
 void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
 {
     try
     
         {
-            float max_depth = 200.0; //maximum distance the setup can measure (in cm)
-            float min_depth = 40.0; //minimum distance the setup can measure (in cm)
-            float depth_thresh = 100.0; // Threshold for SAFE distance (in cm)
             cv::Mat disparity = cv_bridge::toCvShare(msg, "mono8")->image;
             disparity.convertTo(disparity,CV_8UC1,1.0);
-            //cv::cvtColor(disparity, disparity, cv::COLOR_BGR2GRAY);
             int dR = disparity.rows;
             int dC = disparity.cols;
             disparity = disparity(cv::Range(0,dR),cv::Range(37, dC));
@@ -146,56 +139,64 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
                     // Finding the bounding rectangle for the largest contour
                     box = cv::boundingRect(cnt);
                     
+                    // Update position and flag for detected object
                     float boxX = box.x + box.width/2;
                     float boxY = box.y + box.height/2;
-                    data = {boxX, boxY , 1.0};
+                    data[0] = boxX;
+                    data[1] = boxY;
+                    data[2] = 1.0f;
                     detectedObject.data = data;
                     
 
                     // finding average depth of region represented by the largest contour
-                    mask2 = mask*0;
-                    cv::drawContours(mask2, contours, 0, (255), -1);
+                    //mask2 = mask*0;
+                    //cv::drawContours(mask2, contours, 0, (255), -1);
 
                     // Calculating the average depth of the object closer than the safe distance
-                    ROS_INFO("PreDev");
+                    //ROS_INFO("PreDev");
                     //replaceInf(depth_map);
-                    cv::meanStdDev(depth_map, mean, stddev, mask2);
+                    //cv::meanStdDev(depth_map, mean, stddev, mask2);
                     //cv::Scalar mean2 = cv::mean(depth_map, mask2);
-                    double minVal; 
-                    double maxVal;
+                    //double minVal; 
+                    //double maxVal;
 
                     // Printing the warning text with object distance
-                    char text[10];
-                    ROS_INFO_STREAM(mean.at<double>(0,0));
+                    //char text[10];
+                    //ROS_INFO_STREAM(mean.at<double>(0,0));
                     //ROS_INFO_STREAM(mean2);
-                    std::sprintf(text, "%.2f cm",mean.at<double>(0,0));
+                    //std::sprintf(text, "%.2f cm",mean.at<double>(0,0));
                     //ROS_INFO_STREAM(depth_map);
-                    cv::putText(output_canvas, "WARNING!", cv::Point2f(box.x + 5, box.y-40), 1, 2, cv::Scalar(0,0,255), 2, 2);
-                    cv::putText(output_canvas, "Object at", cv::Point2f(box.x + 5, box.y), 1, 2, cv::Scalar(0,0,255), 2, 2);
-                    cv::putText(output_canvas, text, cv::Point2f(box.x + 5, box.y+40), 1, 2, cv::Scalar(0,0,255), 2, 2);
+                    //cv::putText(output_canvas, "WARNING!", cv::Point2f(box.x + 5, box.y-40), 1, 2, cv::Scalar(0,0,255), 2, 2);
+                    //cv::putText(output_canvas, "Object at", cv::Point2f(box.x + 5, box.y), 1, 2, cv::Scalar(0,0,255), 2, 2);
+                    //cv::putText(output_canvas, text, cv::Point2f(box.x + 5, box.y+40), 1, 2, cv::Scalar(0,0,255), 2, 2);
                     //ROS_INFO("STRANGER DANGER");
                 }
             }
             else
             {
                 // Printing SAFE if no obstacle is closer than the safe distance
-                cv::putText(output_canvas, "SAFE!", cv::Point2f(200,200),1,2,cv::Scalar(0,255,0),2,2);
-                data = {0,0,0};
+                //cv::putText(output_canvas, "SAFE!", cv::Point2f(200,200),1,2,cv::Scalar(0,255,0),2,2);
+                data[0] = 0;
+                data[1] = 0;
+                data[2] = 0;
                 detectedObject.data = data;
             }
 
+            verticalCheck(data);
 
             // Displaying the output of the obstacle avoidance system
             
-            cv::imshow("mask", disparity);
+            //cv::imshow("mask", disparity);
             //cv::imshow("mask2", mask2);
-            cv::imshow("output_canvas",output_canvas);
-            pub.publish(detectedObject);
-            cv::waitKey(1);
+            //cv::imshow("output_canvas",output_canvas);
+            //pub.publish(detectedObject);
+            //cv::waitKey(1);
             ROS_INFO("Vector:");
             ROS_INFO_STREAM(data[0]);
             ROS_INFO_STREAM(data[1]);
             ROS_INFO_STREAM(data[2]);
+            ROS_INFO_STREAM(data[3]);
+            ROS_INFO_STREAM(data[4]);
         
 
 
