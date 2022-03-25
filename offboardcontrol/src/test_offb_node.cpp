@@ -47,7 +47,8 @@ int main(int argc, char** argv)
   testArray.data = goVector;
   ros::init(argc, argv, "offb_node");
   ros::NodeHandle nh;
-  test = nh.advertise<std_msgs::Float32MultiArray>("object_detection2", 1);
+  
+  //test = nh.advertise<std_msgs::Float32MultiArray>("object_detection2", 1);
   // the setpoint publishing rate MUST be faster than 2Hz
   ros::Rate rate(20.0);
 
