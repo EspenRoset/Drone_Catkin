@@ -42,7 +42,7 @@ void DroneControl::RunDrone(){
 
             break;
         case 1 /*TakeOff*/: // Check OFFBOARD and arm, Take off to flight altitude
-                if ((current_state.mode == "OFFBOARD") && (current_state.armed) && !Roof_limit){
+                if ((current_state.mode == "OFFBOARD") && (current_state.armed) /*&& !Roof_limit*/){
                     DroneControl::DroneTakeoff(TakeoffAltitude); // Takes of and changes state to flying
                 } else{
                     state = Startup;
