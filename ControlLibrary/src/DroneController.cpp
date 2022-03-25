@@ -71,9 +71,19 @@ void DroneControl::RunDrone(){
         case 5 /*Avoid Obstacle*/: // Limit movement to avoid crashing
                 // Get input from Controller
                 TargetPosition = InputTargetPosition;
+                ROS_INFO_STREAM("Avoiding obstacle");
                 // Limit Movement
-                if (Obstacle_detected){ // Obstacle,  limit x velocity to zero
-                    TargetPosition.velocity.x = 0;
+                if (Obstacle_detected){ // Obstacle in front give a reverse boost then limit x_velocity
+                    auto StartTime = std::chrono::steady_clock::now();
+                    auto Interval = std::chrono::milliseconds(100);
+                    auto EndTime = StartTime + Interval;
+
+                    while (std::chrono::steady_clock::now() < EndTime){ // Reverse boost
+                        TargetPosition.velocity.x = -1;
+                    }
+
+
+                    TargetPosition.velocity.x = 0; // Limit x_velocity
                 }
                 if (Roof_limit){ // Roof too close, limit z velocity to negative
                     if (TargetPosition.velocity.z > 0){
