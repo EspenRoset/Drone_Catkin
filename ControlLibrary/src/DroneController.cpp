@@ -78,10 +78,10 @@ void DroneControl::RunDrone(){
                 if (Obstacle_detected){ // Obstacle in front give a reverse boost then limit x_velocity
                     if(std::chrono::steady_clock::now() < EndTimeReverse){
                         TargetPosition.velocity.x = -1; // Reverse
-                    }
-                    
-
+                        ROS_INFO_STREAM("Reversing");
+                    }else{
                     TargetPosition.velocity.x = 0; // Limit x_velocity
+                    }
                 }
                 if (Roof_limit){ // Roof too close, limit z velocity to negative
                     if (TargetPosition.velocity.z > 0){
