@@ -18,25 +18,36 @@ ros::Publisher test;
 std_msgs::Float32MultiArray testArray;
 std::thread changeVectorThread;
 std::vector<float> goVector = {0.0, 0.0, 0.0, 0.0, 0.0};
-std::vector<float> stopVector = {1.0, 100.0, 100.0};
+std::vector<float> stopVector = {1.0, 100.0, 100.0, 0.0, 0.0};
+
 
 
 void WaitThenChangeVector(){ // Can be used for testing avoidance system
+  while(true){
   testArray.data = goVector;
+  
   ROS_INFO("Waiting to change vector");
-  std::this_thread::sleep_for(std::chrono::seconds(60));
+  std::this_thread::sleep_for(std::chrono::seconds(26));
+  ROS_INFO("3");
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  ROS_INFO("2");
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  ROS_INFO("1");
+  std::this_thread::sleep_for(std::chrono::seconds(1));
   testArray.data = stopVector;
   ROS_INFO("Changed vector");
   std::this_thread::sleep_for(std::chrono::seconds(10));
   testArray.data = goVector;
   ROS_INFO("Changed vector");
+  }
 }
 
 int main(int argc, char** argv)
 {
+  testArray.data = goVector;
   ros::init(argc, argv, "offb_node");
   ros::NodeHandle nh;
-  test = nh.advertise<std_msgs::Float32MultiArray>("object_detection", 1);
+  test = nh.advertise<std_msgs::Float32MultiArray>("object_detection2", 1);
   // the setpoint publishing rate MUST be faster than 2Hz
   ros::Rate rate(20.0);
 
@@ -47,7 +58,7 @@ int main(int argc, char** argv)
   //Dtest.TakeoffAltitude = 2.5;
   Drone.InitiateTakeoff = false;
 
- // changeVectorThread = std::thread(&WaitThenChangeVector); Can be used for testing avoidance system
+ // changeVectorThread = std::thread(&WaitThenChangeVector); //Can be used for testing avoidance system
     while(ros::ok()){
         if (Controller.Arm){ // Arm when controller input says
             Drone.ArmDrone = true;
@@ -65,8 +76,12 @@ int main(int argc, char** argv)
             Drone.InitiateLanding = true;
             ROS_INFO_STREAM("Sent landing command");
         }
-
-        //test.publish(testArray); Can be used for testing avoidance system
+/*
+        try{
+          test.publish(testArray); //Can be used for testing avoidance system
+        } catch(ros::Exception &e){
+          ROS_INFO_STREAM(e.what());
+        }*/
         Drone.InputTargetPosition = Controller.Target; // Send other input from controller to drone
         ros::spinOnce();
         rate.sleep();

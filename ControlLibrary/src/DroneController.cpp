@@ -53,6 +53,8 @@ void DroneControl::RunDrone(){
                 if (InitiateLanding){
                     state = Landing;
                 } if (Obstacle_detected || Roof_limit || Floor_limit){
+                    EndTimeReverse = std::chrono::steady_clock::now() + std::chrono::milliseconds(300);
+                    EndTimeReset = EndTimeReverse + std::chrono::seconds(10);
                     state = AvoidObstacle;
                 }
             break;
@@ -74,14 +76,10 @@ void DroneControl::RunDrone(){
                 ROS_INFO_STREAM("Avoiding obstacle");
                 // Limit Movement
                 if (Obstacle_detected){ // Obstacle in front give a reverse boost then limit x_velocity
-                    auto StartTime = std::chrono::steady_clock::now();
-                    auto Interval = std::chrono::milliseconds(100);
-                    auto EndTime = StartTime + Interval;
-
-                    while (std::chrono::steady_clock::now() < EndTime){ // Reverse boost
-                        TargetPosition.velocity.x = -1;
+                    if(std::chrono::steady_clock::now() < EndTimeReverse){
+                        TargetPosition.velocity.x = -1; // Reverse
                     }
-
+                    
 
                     TargetPosition.velocity.x = 0; // Limit x_velocity
                 }
@@ -180,6 +178,7 @@ void DroneControl::DroneLand(){ // Land the drone and change mode to Startup
     }
 }
 
-void DroneControl::check_height(){
+void DroneControl::ReverseDrone(int reversemillisec){
 
 }
+

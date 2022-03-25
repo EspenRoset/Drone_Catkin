@@ -17,6 +17,7 @@
 #include <thread>
 #include <algorithm>
 #include <mutex>
+#include <chrono>
 #include <condition_variable>
 
 class DroneControl{
@@ -28,11 +29,14 @@ class DroneControl{
         const int Landing = 3;
         const int Landed = 4;
         const int AvoidObstacle = 5;
-
+        
+        std::chrono::time_point<std::chrono::steady_clock> EndTimeReverse; 
+        std::chrono::time_point<std::chrono::steady_clock> EndTimeReset; 
         bool Obstacle_detected = false;
         bool Roof_limit = false;
         bool Floor_limit = false;
         std::vector<float> Obstacle_position;
+
 
         ros::Subscriber state_sub;
         ros::Subscriber pos_sub;
@@ -90,7 +94,7 @@ class DroneControl{
         state_sub = n.subscribe<mavros_msgs::State>("mavros/state", 10, &DroneControl::state_cb, this);
         pos_sub = n.subscribe<nav_msgs::Odometry>("mavros/local_position/odom", 10, &DroneControl::pose_cb, this);
         pos_pub = n.advertise<mavros_msgs::PositionTarget>("/mavros/setpoint_raw/local", 10);
-        collision_sub = n.subscribe<std_msgs::Float32MultiArray>("object_detection", 10, &DroneControl::collision_cb, this);
+        collision_sub = n.subscribe<std_msgs::Float32MultiArray>("object_detection2", 10, &DroneControl::collision_cb, this);
         arming_client = n.serviceClient<mavros_msgs::CommandBool>("mavros/cmd/arming");
         set_mode_client = n.serviceClient<mavros_msgs::SetMode>("mavros/set_mode");
         landing_client = n.serviceClient<mavros_msgs::CommandTOL>("mavros/cmd/land");
@@ -105,6 +109,7 @@ class DroneControl{
     void state_cb(const mavros_msgs::State::ConstPtr& msg);
     void pose_cb(const nav_msgs::Odometry::ConstPtr& msg);
     void collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg);
+    void ReverseDrone(int reverseMilliSec);
     void check_height();
     void RunDrone();
 };
