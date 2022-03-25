@@ -144,21 +144,22 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
                     // Update position and flag for detected object
                     float boxX = box.x + box.width/2;
                     float boxY = box.y + box.height/2;
+                    
                     data[0] = boxX;
-                    data[1] = boxY;
+                    
                     data[2] = 1.0f;
                     
                     
 
-                    // finding average depth of region represented by the largest contour
-                    //mask2 = mask*0;
-                    //cv::drawContours(mask2, contours, 0, (255), -1);
+                    //finding average depth of region represented by the largest contour
+                    mask2 = mask*0;
+                    cv::drawContours(mask2, contours, 0, (255), -1);
 
                     // Calculating the average depth of the object closer than the safe distance
                     //ROS_INFO("PreDev");
                     //replaceInf(depth_map);
-                    //cv::meanStdDev(depth_map, mean, stddev, mask2);
-                    //cv::Scalar mean2 = cv::mean(depth_map, mask2);
+                    cv::meanStdDev(depth_map, mean, stddev, mask2);
+                    data[1] = mean.at<float>(0,0);
                     //double minVal; 
                     //double maxVal;
 
