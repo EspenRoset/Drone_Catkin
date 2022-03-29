@@ -104,7 +104,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             disparity.convertTo(disparity,CV_8UC1,1.0);
             int dR = disparity.rows;
             int dC = disparity.cols;
-            disparity = disparity(cv::Range(0,dR),cv::Range(37, dC));
+            disparity = disparity(cv::Range(0,dR),cv::Range(37, dC)); // Remove dead part of frame
             cv::Mat output_canvas = this->output;
             cv::Mat depth_map = 6646.777f/disparity;
             depth_map +=21.669;
@@ -159,13 +159,12 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
                     //ROS_INFO("PreDev");
                     //replaceInf(depth_map);
                     cv::meanStdDev(depth_map, mean, stddev, mask2);
-                    data[1] = mean.at<float>(0,0);
+                    data[1] = mean.at<double>(0,0);
                     //double minVal; 
                     //double maxVal;
 
                     // Printing the warning text with object distance
                     //char text[10];
-                    //ROS_INFO_STREAM(mean.at<double>(0,0));
                     //ROS_INFO_STREAM(mean2);
                     //std::sprintf(text, "%.2f cm",mean.at<double>(0,0));
                     //ROS_INFO_STREAM(depth_map);
