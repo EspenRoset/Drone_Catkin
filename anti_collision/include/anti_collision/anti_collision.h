@@ -41,7 +41,7 @@ class analysis
 
     float minDistRoof = 1500; // Minimum distance above drone  (mm)
     float minAltitude = 500;  // Minimum distance bellow drone (mm)
-    float depth_thresh = 60;  // Threshold for SAFE distance (cm)
+    float depth_thresh = 105;  // Threshold for SAFE distance (cm)
 
     analysis(ros::NodeHandle& nh){
         image_transport::ImageTransport it(nh);
