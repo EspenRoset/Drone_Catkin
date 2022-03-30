@@ -68,6 +68,7 @@ void DroneControl::RunDrone(){
                 std::unique_lock<std::mutex> lk(ArmMutex);
                 cv.wait(lk, [&]{return InitiateTakeoff;});
                 }
+                DroneControl::SetPX4Mode("OFFBOARD"); // Change mode to offboard after drone is landed
                 state = Takeoff;
             break;
         case 5 /*Avoid Obstacle*/: // Limit movement to avoid crashing
