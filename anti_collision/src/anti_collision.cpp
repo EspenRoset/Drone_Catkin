@@ -100,6 +100,34 @@ float analysis::CalcVx(double avgDistance){
     return Vx;
 }
 
+
+float analysis::CalcVy(cv::Rect b, float Vx)
+{
+    // Boundaries
+    int Sl = Ox - k4;
+    int Sr = Ox + k4;
+    // Object cord left and right edge
+    int xl = b.x;
+    int xr = b.x+b.width;
+    // distance edges from Ox
+    int ll = Ox-b.x;
+    int lr = (b.x+b.width) - Ox;
+
+    if (ll>lr) // If box is further to the left - turn right
+    {
+        return (xr-Sl)*Vx/200;
+    }
+    else if (lr>ll)
+    {
+        return -(Sr-xl)*Vx/200;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+
 void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
 {
     try
@@ -166,6 +194,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
                     cv::meanStdDev(depth_map, mean, stddev, mask2);
                     data[1] = mean.at<double>(0,0);
                     data[5] = CalcVx(data[1]); //Calculate reversing speed
+                    data[6] = CalcVy(box,data[5]);
 
                     //double minVal; 
                     //double maxVal;
@@ -184,6 +213,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             else
             {
                 data[5] = 0; // Dont send reversing distance if there is no obstacle
+                data[6] = 0;
                 // Printing SAFE if no obstacle is closer than the safe distance
                 //cv::putText(output_canvas, "SAFE!", cv::Point2f(200,200),1,2,cv::Scalar(0,255,0),2,2);
                 
@@ -206,6 +236,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             ROS_INFO_STREAM(data[3]);
             ROS_INFO_STREAM(data[4]);
             ROS_INFO_STREAM(data[5]);
+            ROS_INFO_STREAM(data[6]);
         
 
 

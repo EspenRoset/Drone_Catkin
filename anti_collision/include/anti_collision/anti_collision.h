@@ -44,10 +44,15 @@ class analysis
     float minAltitude = 500;  // Minimum distance bellow drone (mm)
     float depth_thresh = 105;  // Threshold for SAFE distance (cm)
 
+    // Param REVERSE
     float k1 = 1.3; // Max reverse speed
     float k2  = 0.5; // Distance when max reverse is applied
     float k3 = 12.5; // Adjust curve shape -> Higher value = Steeper curve 
     float Vx = 0; //Speed in x direction, to slow down drone
+    
+    // Param ROLL
+    int Ox = 200; // Relative origo disparity map
+    float k4 = 50; // Distance from origo considered safe
 
     analysis(ros::NodeHandle& nh){
         image_transport::ImageTransport it(nh);
@@ -68,6 +73,7 @@ class analysis
     void updateFrame1(const sensor_msgs::ImageConstPtr& msg);
     void Calibration(const sensor_msgs::ImageConstPtr& msg);
     float CalcVx(double avgDistance);
+    float CalcVy(cv::Rect b, float Vx);
     //bool compareContourAreas( std::vector<cv::Point> contour1, std::vector<cv::Point> contour2 );
     
 
