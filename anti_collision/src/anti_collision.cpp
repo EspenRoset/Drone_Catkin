@@ -96,7 +96,7 @@ void analysis::verticalCheck(std::vector<float>& data)
 }
 
 float analysis::CalcVx(double avgDistance){
-    Vx = -k1 * std::exp(k3*(k2-avgDistance));
+    Vx = -k1 * std::exp(k3*(k2-(avgDistance*0.01)));
     return Vx;
 }
 
