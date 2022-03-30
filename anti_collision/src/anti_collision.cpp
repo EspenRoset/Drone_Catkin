@@ -165,6 +165,8 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
                     //replaceInf(depth_map);
                     cv::meanStdDev(depth_map, mean, stddev, mask2);
                     data[1] = mean.at<double>(0,0);
+                    data[5] = CalcVx(data[1]); //Calculate reversing speed
+
                     //double minVal; 
                     //double maxVal;
 
@@ -179,15 +181,15 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
                     //ROS_INFO("STRANGER DANGER");
                 }
             }
-            //else
-            //{
+            else
+            {
+                data[5] = 0; // Dont send reversing distance if there is no obstacle
                 // Printing SAFE if no obstacle is closer than the safe distance
                 //cv::putText(output_canvas, "SAFE!", cv::Point2f(200,200),1,2,cv::Scalar(0,255,0),2,2);
                 
-            //}
+            }
             
             verticalCheck(data);
-            data[5] = CalcVx(data[1]); //Calculate reversing speed
             detectedObject.data = data;
 
             // Displaying the output of the obstacle avoidance system
