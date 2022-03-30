@@ -14,6 +14,8 @@ void DroneControl::collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg
     //Roof_limit = static_cast<int>(msg->data[3]);
     Roof_limit = 0; //Disable roof_limit
     Floor_limit = static_cast<int>(msg->data[4]);
+    AvoidReverse = msg->data[5];
+    AvoidRoll = msg->data[6];
     Obstacle_position = {msg->data[0], msg->data[1], msg->data[3], msg->data[4]}; // X, Y, to high, too low
 }
 
@@ -53,8 +55,8 @@ void DroneControl::RunDrone(){
                 if (InitiateLanding){
                     state = Landing;
                 } if (Obstacle_detected || Roof_limit || Floor_limit){
-                    EndTimeReverse = std::chrono::steady_clock::now() + std::chrono::milliseconds(300);
-                    EndTimeReset = EndTimeReverse + std::chrono::seconds(10);
+                    //EndTimeReverse = std::chrono::steady_clock::now() + std::chrono::milliseconds(300);
+                    //EndTimeReset = EndTimeReverse + std::chrono::seconds(10);
                     state = AvoidObstacle;
                 }
             break;
@@ -76,13 +78,10 @@ void DroneControl::RunDrone(){
                 TargetPosition = InputTargetPosition;
                 ROS_INFO_STREAM("Avoiding obstacle");
                 // Limit Movement
-                if (Obstacle_detected){ // Obstacle in front give a reverse boost then limit x_velocity
-                    if(std::chrono::steady_clock::now() < EndTimeReverse){
-                        TargetPosition.velocity.x = -1; // Reverse
-                        ROS_INFO_STREAM("Reversing");
-                    }else{
-                    TargetPosition.velocity.x = 0; // Limit x_velocity
-                    }
+                if (Obstacle_detected){ // USe velocities from anti_collision to avoid obstacle
+                    TargetPosition.velocity.x = TargetPosition.velocity.x + AvoidReverse;
+                    TargetPosition.velocity.y = TargetPosition.velocity.y + AvoidRoll;
+        
                 }
                 if (Roof_limit){ // Roof too close, limit z velocity to negative
                     if (TargetPosition.velocity.z > 0){

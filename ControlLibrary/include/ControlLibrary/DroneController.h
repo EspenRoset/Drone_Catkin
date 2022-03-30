@@ -36,6 +36,8 @@ class DroneControl{
         bool Roof_limit = false;
         bool Floor_limit = false;
         std::vector<float> Obstacle_position;
+        float AvoidReverse = 0;
+        float AvoidRoll = 0;
 
 
         ros::Subscriber state_sub;
@@ -99,8 +101,9 @@ class DroneControl{
         set_mode_client = n.serviceClient<mavros_msgs::SetMode>("mavros/set_mode");
         landing_client = n.serviceClient<mavros_msgs::CommandTOL>("mavros/cmd/land");
 
-        TargetPosition.coordinate_frame = mavros_msgs::PositionTarget::FRAME_BODY_NED; // Body frame
+        TargetPosition.coordinate_frame = mavros_msgs::PositionTarget::FRAME_BODY_NED; // Use body frame
         TargetPosition.type_mask = 1024; //Ignore Yaw angle, use Yaw_rate
+        TargetPosition.velocity.y = 0;
 
         RunThread = std::thread(&DroneControl::RunDrone, this);
         ROS_INFO("Drone initialized");
