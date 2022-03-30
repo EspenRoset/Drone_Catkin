@@ -97,6 +97,7 @@ void analysis::verticalCheck(std::vector<float>& data)
 
 float analysis::CalcVx(double avgDistance){
     Vx = -k1 * std::exp(k3*(k2-avgDistance));
+    return Vx;
 }
 
 void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
