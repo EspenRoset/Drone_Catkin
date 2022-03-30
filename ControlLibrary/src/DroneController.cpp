@@ -11,7 +11,7 @@ void DroneControl::pose_cb(const nav_msgs::Odometry::ConstPtr& msg){
 
 void DroneControl::collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg){
     Obstacle_detected = static_cast<int>(msg->data[2]);
-    //Roof_limit = static_cast<int>(msg->data[3]);
+    //Roof_limit = static_cast<int>(msg->data[3]); 
     Roof_limit = 0; //Disable roof_limit
     Floor_limit = static_cast<int>(msg->data[4]);
     AvoidReverse = msg->data[5];
@@ -25,14 +25,14 @@ void DroneControl::RunDrone(){
         {
         case 0 /*StartUp*/: // Initialize, Change to OFFBOARD Mode, Arm Quad
                 DroneControl::WaitForFCUConnection(); // Wait for FCU Connection
-                DroneControl::SendNWaipoints(100); // Send some waypoints to prepare for mode change
-                DroneControl::SetPX4Mode("OFFBOARD"); // Change mode to offboard
                 // Wait for arm command
-                ROS_INFO_STREAM("Waiting for arming");
+                ROS_INFO_STREAM("Waiting for start/arm command (Rb)");
                 {
                 std::unique_lock<std::mutex> lk(ArmMutex);
                 cv.wait(lk, [&]{return ArmDrone;});
                 }
+                DroneControl::SendNWaipoints(100); // Send some waypoints to prepare for mode change
+                DroneControl::SetPX4Mode("OFFBOARD"); // Change mode to offboard
                 DroneControl::PX4Arm();
                 // Wait for takeoff command
                 ROS_INFO_STREAM("Waiting for Takeoff command");
