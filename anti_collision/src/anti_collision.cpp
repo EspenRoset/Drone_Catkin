@@ -95,6 +95,10 @@ void analysis::verticalCheck(std::vector<float>& data)
     }
 }
 
+float analysis::CalcVx(double avgDistance){
+    Vx = -k1 * std::exp(k3*(k2-avgDistance));
+}
+
 void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
 {
     try
@@ -160,6 +164,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
                     //replaceInf(depth_map);
                     cv::meanStdDev(depth_map, mean, stddev, mask2);
                     data[1] = mean.at<double>(0,0);
+                    data[5] = CalcVx(data[1]);
                     //double minVal; 
                     //double maxVal;
 
@@ -196,6 +201,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             ROS_INFO_STREAM(data[2]);
             ROS_INFO_STREAM(data[3]);
             ROS_INFO_STREAM(data[4]);
+            ROS_INFO_STREAM(data[5]);
         
 
 

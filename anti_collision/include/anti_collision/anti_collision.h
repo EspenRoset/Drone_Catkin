@@ -14,6 +14,7 @@
 #include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/String.h>
 #include <vector>
+#include <math.h>
 
 
 void sayHello();
@@ -30,7 +31,7 @@ class analysis
     image_transport::Publisher pubGrid;
 
     std_msgs::Float32MultiArray detectedObject;
-    std::vector<float> data{0,0,0,0,0}; // {x,y,f,fu,fd} x,y = location of object | f = 1 object is too close 
+    std::vector<float> data{0,0,0,0,0,0,0}; // {x,y,f,fu,fd,vx,vy} x,y = location of object | f = 1 object is too close 
                                         //               fu = 1 to high           | fd = to low
     cv::Mat output;
     float sensorUp;             
@@ -42,6 +43,11 @@ class analysis
     float minDistRoof = 1500; // Minimum distance above drone  (mm)
     float minAltitude = 500;  // Minimum distance bellow drone (mm)
     float depth_thresh = 105;  // Threshold for SAFE distance (cm)
+
+    float k1 = 1.3; // Max reverse speed
+    float k2  = 0.4; // Distance when max reverse is applied
+    float k3 = 12.5; // Adjust curve shape -> Higher value = Steeper curve 
+    float Vx = 0; //Speed in x direction, to slow down drone
 
     analysis(ros::NodeHandle& nh){
         image_transport::ImageTransport it(nh);
@@ -61,6 +67,7 @@ class analysis
     void gridview(const sensor_msgs::ImageConstPtr& msg);
     void updateFrame1(const sensor_msgs::ImageConstPtr& msg);
     void Calibration(const sensor_msgs::ImageConstPtr& msg);
+    float CalcVx(double avgDistance);
     //bool compareContourAreas( std::vector<cv::Point> contour1, std::vector<cv::Point> contour2 );
     
 
