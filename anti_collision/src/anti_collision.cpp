@@ -165,7 +165,6 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
                     //replaceInf(depth_map);
                     cv::meanStdDev(depth_map, mean, stddev, mask2);
                     data[1] = mean.at<double>(0,0);
-                    data[5] = CalcVx(data[1]);
                     //double minVal; 
                     //double maxVal;
 
@@ -188,7 +187,9 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             //}
             
             verticalCheck(data);
+            data[5] = CalcVx(data[1]); //Calculate reversing speed
             detectedObject.data = data;
+
             // Displaying the output of the obstacle avoidance system
             
             //cv::imshow("mask", disparity);
