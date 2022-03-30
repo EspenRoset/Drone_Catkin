@@ -13,7 +13,7 @@ ToF.set_distance_mode(2)
 def GetDistance():
     pub = rospy.Publisher('distance_down', String, queue_size=10)
     rospy.init_node('VL53L1X', anonymous=True)
-    rate = rospy.Rate(20)
+    rate = rospy.Rate(5)
     while not rospy.is_shutdown():
         try:
             ToF.start_ranging()  # Write configuration bytes to initiate measurement

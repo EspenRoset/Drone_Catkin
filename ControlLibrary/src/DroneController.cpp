@@ -64,11 +64,11 @@ void DroneControl::RunDrone(){
         case 4 /*Landed*/: // Be ready to change mode to takeoff
                 ROS_INFO_STREAM("Landed and waiting");
                 ROS_INFO_STREAM("Press takeoff to fly");
+                DroneControl::SetPX4Mode("OFFBOARD"); // Change mode to offboard after drone is landed
                 {
                 std::unique_lock<std::mutex> lk(ArmMutex);
                 cv.wait(lk, [&]{return InitiateTakeoff;});
                 }
-                DroneControl::SetPX4Mode("OFFBOARD"); // Change mode to offboard after drone is landed
                 state = Takeoff;
             break;
         case 5 /*Avoid Obstacle*/: // Limit movement to avoid crashing
@@ -107,7 +107,7 @@ void DroneControl::RunDrone(){
     }
 }
 
-void DroneControl::WaitForFCUConnection(){ // Wait untiul connection with PX4 is established
+void DroneControl::WaitForFCUConnection(){ // Wait until connection with PX4 is established
     while (ros::ok() && !current_state.connected)
             {
                 ros::spinOnce();
