@@ -35,7 +35,7 @@ void DroneControl::RunDrone(){
                 DroneControl::SetPX4Mode("OFFBOARD"); // Change mode to offboard
                 DroneControl::PX4Arm();
                 // Wait for takeoff command
-                ROS_INFO_STREAM("Waiting for Takeoff command");
+                ROS_INFO_STREAM("Waiting for Takeoff command (Rb + A)");
                 {
                 std::unique_lock<std::mutex> lk(ArmMutex);
                 cv.wait(lk, [&]{return InitiateTakeoff;});
