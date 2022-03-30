@@ -14,11 +14,11 @@
 #include <std_msgs/Float32MultiArray.h>
 
 
-ros::Publisher test;
+
 std_msgs::Float32MultiArray testArray;
 std::thread changeVectorThread;
 std::vector<float> goVector = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-std::vector<float> stopVector = {1.0, 100.0, 100.0, -2.0, 0.0};
+std::vector<float> stopVector = {1.0, 100.0, 100.0, 0.0, 0.0, -2.0, 0.0};
 
 
 
@@ -45,11 +45,10 @@ void WaitThenChangeVector(){ // Can be used for testing avoidance system
 int main(int argc, char** argv)
 {
   testArray.data = goVector;
-  ros::init(argc, argv, "offb_node");
+  ros::init(argc, argv, "offb_node_simu");
   ros::NodeHandle nh;
-  
-  test = nh.advertise<std_msgs::Float32MultiArray>("object_detection", 1);
-  // the setpoint publishing rate MUST be faster than 2Hz
+  ros::Publisher test = nh.advertise<std_msgs::Float32MultiArray>("object_detection", 1);
+    // the setpoint publishing rate MUST be faster than 2Hz
   ros::Rate rate(20.0);
 
   ControllerConverter Controller(nh, rate);
