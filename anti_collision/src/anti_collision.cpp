@@ -115,7 +115,12 @@ float analysis::CalcVy(cv::Rect b, float Vx)
     // edges distance from center
     int ll = disparitry_center - b.x;
     int lr = (b.x+b.width) - disparitry_center;
+    ROS_INFO("**CalcVy**");
     ROS_INFO_STREAM(Vx);
+    if (xr>Sr && xl<Sl)
+    {
+        return 0;
+    }
     if (ll>lr) // If box is further to the left, ll is longer - best action: Roll right (Positive return value)
     {
         if (xr<Sl) //Object is far enough to the left
@@ -162,7 +167,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::Mat output_canvas = this->output;
             cv::Mat depth_map = 6646.777f/disparity;
             depth_map +=21.669;
-
+            ROS_INFO_STREAM(disparity.cols);
             cv::Mat mask, mean, stddev, mask2;
             // Mask to segment regions with depth less than safe distance
             cv::inRange(depth_map, 10, depth_thresh, mask);
@@ -215,7 +220,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
                     cv::meanStdDev(depth_map, mean, stddev, mask2);
                     data[1] = mean.at<double>(0,0);
                     data[5] = CalcVx(data[1]); //Calculate reversing speed
-                    data[6] = 0;//CalcVy(box,data[5]);
+                    data[6] = CalcVy(box,data[5]);
 
                     //double minVal; 
                     //double maxVal;
