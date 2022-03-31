@@ -46,7 +46,11 @@ void DroneControl::RunDrone(){
         case 1 /*TakeOff*/: // Check OFFBOARD and arm, Take off to flight altitude
                 if ((current_state.mode == "OFFBOARD") && (current_state.armed) /*&& !Roof_limit*/){
                     DroneControl::DroneTakeoff(TakeoffAltitude); // Takes of and changes state to flying
+
                 } else{
+                    ROS_INFO("Not armed or OFFBOARD Mode");
+                    ROS_INFO_STREAM(current_state.mode);
+                    ROS_INFO_STREAM(current_state.armed);
                     state = Startup;
                 }
             break;
