@@ -80,7 +80,6 @@ void analysis::Calibration(const sensor_msgs::ImageConstPtr& msg){
     cv::waitKey(1);
 }
 
-
 void analysis::verticalCheck(std::vector<float>& data)
 {
     if (sensorUp>minDistRoof){
@@ -103,23 +102,45 @@ float analysis::CalcVx(double avgDistance){
 
 float analysis::CalcVy(cv::Rect b, float Vx)
 {
+    //  -----Sl----disparity_center----Sr-----  //
+    //  -------xl----------------xr-----------  //
+    //          ----ll----|--lr---              //
+    //return Sl----------------- xr             //
     // Boundaries
-    int Sl = Ox - k4;
-    int Sr = Ox + k4;
-    // Object cord left and right edge
-    int xl = b.x;
-    int xr = b.x+b.width;
-    // distance edges from Ox
-    int ll = Ox-b.x;
-    int lr = (b.x+b.width) - Ox;
-
-    if (ll>lr) // If box is further to the left - turn right
+    int Sl = disparitry_center - k4;
+    int Sr = disparitry_center + k4;
+    // position of left and right edge of object
+    int xl = b.x; // Left
+    int xr = b.x + b.width; // Right
+    // edges distance from center
+    int ll = disparitry_center - b.x;
+    int lr = (b.x+b.width) - disparitry_center;
+    ROS_INFO_STREAM(Vx);
+    if (ll>lr) // If box is further to the left, ll is longer - best action: Roll right (Positive return value)
     {
-        return (xr-Sl)*Vx/200;
+        if (xr<Sl) //Object is far enough to the left
+        {
+            ROS_INFO("CLEAR RIGHT");
+            return 0;
+        }
+        else
+        {
+            ROS_INFO("ROLLING RIGHT");
+            return (xr-Sl)*Vx*k5;
+        }
     }
-    else if (lr>ll)
+    else if (lr>ll) // If box is further to the right, lr is longer - best action: Roll left (negative return value)
     {
-        return -(Sr-xl)*Vx/200;
+        if (xl>Sr) // Object is far enough to the right
+        {
+            ROS_INFO("CLEAR LEFT");
+            return 0;
+        }
+        else
+        {   
+            ROS_INFO("ROLLING LEFT");
+            return -(Sr-xl)*Vx*k5;
+        }
     }
     else
     {

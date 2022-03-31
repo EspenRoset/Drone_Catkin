@@ -51,8 +51,9 @@ class analysis
     float Vx = 0; //Speed in x direction, to slow down drone
     
     // Param ROLL
-    int Ox = 200; // Relative origo disparity map
+    int disparitry_center = 200; // Relative origo disparity map
     float k4 = 50; // Distance from origo considered safe
+    float k5 = 0.005; // Gain roll - CAREFUL WITH THIS
 
     analysis(ros::NodeHandle& nh){
         image_transport::ImageTransport it(nh);
