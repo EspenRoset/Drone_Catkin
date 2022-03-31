@@ -46,8 +46,8 @@ class analysis
 
     // Param REVERSE
     float k1 = 1.3; // Max reverse speed
-    float k2  = 0.5; // Distance when max reverse is applied
-    float k3 = 12.5; // Adjust curve shape -> Higher value = Steeper curve 
+    float k2  = 0.4; // Distance when max reverse is applied
+    float k3 = 2.5; // Adjust curve shape -> Higher value = Steeper curve 
     float Vx = 0; //Speed in x direction, to slow down drone
     
     // Param ROLL
