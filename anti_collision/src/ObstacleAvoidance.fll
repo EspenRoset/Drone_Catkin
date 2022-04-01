@@ -42,6 +42,7 @@ InputVariable: ScreenRD
   range: 0.000 1.000
   lock-range: false
   term: notSafe Trapezoid 0.000 0.000 0.500 0.800
+  term: safe Trapezoid 0.500 0.700 1.000 1.000
 
 
 OutputVariable: Roll
@@ -87,3 +88,6 @@ RuleBlock: mamdani
   rule: if ScreenRS is medium then Roll is left
   rule: if ScreenRS is large then Roll is hardLeft
 
+  rule: if ScreenLS is large and ScreenLD is notSafe then Pitch is hardReverse
+  rule: if ScreenMS is large and ScreenMD is notSafe then Pitch is hardReverse
+  rule: if ScreenRS is large and ScreenRD is notSafe then Pitch is hardReverse
