@@ -51,7 +51,7 @@ OutputVariable: Roll
   lock-range: false
   aggregation: Maximum
   defuzzifier: Centroid 100
-  default: nan
+  default: 0
   lock-previous: false
   term: hardLeft Trapezoid 0.000 0.000 0.150 0.300
   term: left Triangle 0.200 0.350 0.500
@@ -65,7 +65,7 @@ enabled: true
   lock-range: false
   aggregation: Maximum
   defuzzifier: Centroid 100
-  default: nan
+  default: 0
   lock-previous: false
   term: stay Trapezoid 0.000 0.000 0.150 0.300
   term: reverse Triangle 0.250 0.500 0.750

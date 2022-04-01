@@ -95,7 +95,7 @@ class analysis
     void Calibration(const sensor_msgs::ImageConstPtr& msg);
     float CalcVx(double avgDistance);
     float CalcVy(cv::Rect b, float Vx);
-    std::vector<float> FuzzyGetVelocities(float maxRoll, float maxPitch);
+    void FuzzyGetVelocities(float maxRoll, float maxPitch);
     //bool compareContourAreas( std::vector<cv::Point> contour1, std::vector<cv::Point> contour2 );
     
 
