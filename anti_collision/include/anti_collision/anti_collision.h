@@ -38,7 +38,7 @@ class analysis
     float sensorUp;             
     float sensorDown;
 
-    fl::Engine* engine = fl::FllImporter().fromFile("../src/ObstacleAvoidance.fll"); // Fuzzy engine
+    fl::Engine* engine = fl::FllImporter().fromFile("/home/hgr/Drone_Catkin/src/anti_collision/src/ObstacleAvoidance.fll"); // Fuzzy engine
 
     fl::InputVariable* ScreenLS = engine->getInputVariable("ScreenLS"); // Fuzzy inputs
     fl::InputVariable* ScreenLD = engine->getInputVariable("ScreenLD");
@@ -54,16 +54,15 @@ class analysis
 
     public:
 
-    float screenLS;
-    float screenLD;
-    float screenMS;
-    float screenMD;
-    float screenRS;
-    float screenRD;
 
     float minDistRoof = 1500; // Minimum distance above drone  (mm)
     float minAltitude = 500;  // Minimum distance bellow drone (mm)
     float depth_thresh = 105;  // Threshold for SAFE distance (cm)
+
+    // Param Fuzzy
+    float maxRoll = 1;
+    float maxPitch = 1;
+
 
     // Param REVERSE
     float k1 = 1.3; // Max reverse speed

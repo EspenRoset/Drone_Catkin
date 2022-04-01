@@ -8,8 +8,11 @@ std::vector<float> analysis::FuzzyGetVelocities(float maxRoll, float maxPitch){
 
     //Scale Roll
     velocities[1] = maxRoll*FuzzyRoll;
+    ROS_INFO("VELOCITITTIES");
+    ROS_INFO_STREAM(velocities[1]);
     //Scale Pitch
     velocities[0] = -maxPitch*FuzzyPitch;
+    ROS_INFO_STREAM(velocities[0]);
 
     return velocities;
 }
@@ -202,9 +205,9 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             double img_areaL = double(maskL.rows * maskL.cols);
             double img_areaM = double(maskM.rows * maskM.cols);
             double img_areaR = double(maskR.rows * maskR.cols);
-            screenLS = sL/img_areaL;
-            screenMS = sM/img_areaM;
-            screenRS = sR/img_areaR;
+            ScreenLS->setValue(sL/img_areaL);
+            ScreenMS->setValue(sM/img_areaM);
+            ScreenRS->setValue( sR/img_areaR);
 
             std::vector<std::vector<cv::Point>> contours;
             std::vector<cv::Vec4i> hierarchy;
@@ -219,32 +222,32 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
 
             cv::meanStdDev(depth_left, mean, stddev, maskL);
             cv::imshow("mask2", mask2);
-            screenLD = mean.at<double>(0,0);
+            ScreenLD->setValue(mean.at<double>(0,0)/60 - 0.66667); // Normalize
             cv::findContours(maskM, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
             std::sort(contours.begin(), contours.end(), compareContourAreas);
             cnt = contours[0];
-            mask2 = maskM*0;
             cv::drawContours(mask2, contours, 0, (255), -1);
-            cv::meanStdDev(depth_mid, mean, stddev, mask2);
-            screenMD = mean.at<double>(0,0);
+            cv::meanStdDev(depth_mid, mean, stddev, maskM);
+            ScreenMD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize
             
 
             cv::findContours(maskR, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
             std::sort(contours.begin(), contours.end(), compareContourAreas);
             cnt = contours[0];
-            screenRS = fabs( cv::contourArea(cv::Mat(cnt)))/(depth_right.cols*depth_right.rows);
-            mask2 = maskR*0;
+            
             cv::drawContours(mask2, contours, 0, (255), -1);
-            cv::meanStdDev(depth_right, mean, stddev, mask2);
-            screenRD = mean.at<double>(0,0);
-            ROS_INFO("Distance");
-            ROS_INFO_STREAM(screenLD);
-            ROS_INFO_STREAM(screenMD);
-            ROS_INFO_STREAM(screenRD);
-            ROS_INFO("Size");
-            ROS_INFO_STREAM(screenLS);
-            ROS_INFO_STREAM(screenMS);
-            ROS_INFO_STREAM(screenRS);
+            cv::meanStdDev(depth_right, mean, stddev, maskR);
+            ScreenRD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize
+
+            std::vector<float> v = analysis::FuzzyGetVelocities(maxRoll, maxPitch);
+            data[5] = v[0];
+            data[6] = v[1];
+
+            verticalCheck(data);
+            detectedObject.data = data;
+            pub.publish(detectedObject);
+
+
         }
          
     catch(cv_bridge::Exception& e)
