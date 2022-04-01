@@ -8,10 +8,17 @@ std::vector<float> analysis::FuzzyGetVelocities(float maxRoll, float maxPitch){
 
     //Scale Roll
     velocities[1] = (maxRoll/0.5)*FuzzyRoll-maxRoll;
-    ROS_INFO("VELOCITITTIES");
+    ROS_INFO("Speed Roll-Pitch:");
     ROS_INFO_STREAM(velocities[1]);
     //Scale Pitch
-    velocities[0] = (-maxPitch/0.5)*FuzzyPitch-maxPitch;
+    if (FuzzyPitch>0.4f)
+    {
+        velocities[0] = -maxPitch*FuzzyPitch;
+    }
+    else 
+    {
+        velocities[0] = 0;
+    }
     ROS_INFO_STREAM(velocities[0]);
 
     return velocities;
@@ -188,10 +195,10 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::Mat depth_left = depth_map(cv::Range(0,dR),cv::Range(0, sliceIndex));
             cv::Mat depth_mid = depth_map(cv::Range(0,dR),cv::Range(sliceIndex, 2*sliceIndex));
             cv::Mat depth_right = depth_map(cv::Range(0,dR),cv::Range(2*sliceIndex, 3*sliceIndex));
-            cv::imshow("Left", depth_left);
-            cv::imshow("mid", depth_mid);
-            cv::imshow("right", depth_right);
-            cv::waitKey(1);
+            //cv::imshow("Left", depth_left);
+            //cv::imshow("mid", depth_mid);
+            //cv::imshow("right", depth_right);
+            //cv::waitKey(1);
             cv::Mat mask, mean, stddev, mask2, maskL, maskM, maskR;
             // Mask to segment regions with depth less than safe distance
             //cv::inRange(depth_map, 10, depth_thresh, mask);

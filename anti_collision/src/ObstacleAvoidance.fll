@@ -73,13 +73,31 @@ enabled: true
 
 RuleBlock: mamdani
   enabled: true
-  conjunction: none
+  conjunction: AlgebraicProduct
   disjunction: none
   implication: AlgebraicProduct
   activation: General
 
+  rule: if ScreenLD is notSafe and ScreenLS is large then Pitch is hardReverse
+  rule: if ScreenMD is notSafe and ScreenMS is large then Pitch is hardReverse
+  rule: if ScreenRD is notSafe and ScreenRS is large then Pitch is hardReverse
+
+
+  rule: if ScreenLD is notSafe then Pitch is reverse
+  rule: if ScreenMD is notSafe then Pitch is reverse
+  rule: if ScreenRD is notSafe then Pitch is reverse
+
+  rule: if ScreenLS is small then Pitch is stay
+  rule: if ScreenMS is small then Pitch is stay
+  rule: if ScreenRS is small then Pitch is stay
+
+  rule: if ScreenLD is safe then Pitch is stay
+  rule: if ScreenMD is safe then Pitch is stay
+  rule: if ScreenRD is safe then Pitch is stay
+
+
   rule: if ScreenLS is nothing then Roll is stay
-  rule: if ScreenLS is small then Roll ir right
+  rule: if ScreenLS is small then Roll is right
   rule: if ScreenLS is medium then Roll is right
   rule: if ScreenLS is large then Roll is hardRight
 
@@ -88,6 +106,14 @@ RuleBlock: mamdani
   rule: if ScreenRS is medium then Roll is left
   rule: if ScreenRS is large then Roll is hardLeft
 
-  rule: if ScreenLS is large and ScreenLD is notSafe then Pitch is hardReverse
-  rule: if ScreenMS is large and ScreenMD is notSafe then Pitch is hardReverse
-  rule: if ScreenRS is large and ScreenRD is notSafe then Pitch is hardReverse
+  rule: if ScreenLS is small and ScreenMS is small then Roll is right
+  rule: if ScreenLS is small and Screen MS is medium then Roll is right
+  rule: if ScreenLS is medium and Screen MS is medium then Roll is right
+  rule: if ScreenLS is medium and Screen MS is large then Roll is hardRight
+  rule: if ScreenLS is large and Screen MS is large then Roll is hardRight
+
+  rule: if ScreenRS is small and ScreenMS is small then Roll is left
+  rule: if ScreenRS is small and Screen MS is medium then Roll is left
+  rule: if ScreenRS is medium and Screen MS is medium then Roll is left
+  rule: if ScreenRS is medium and Screen MS is large then Roll is hardLeft
+  rule: if ScreenRS is large and Screen MS is large then Roll is hardLeft
