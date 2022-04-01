@@ -218,7 +218,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
 
             std::vector<std::vector<cv::Point>> contours;
             std::vector<cv::Vec4i> hierarchy;
-            cv::imshow("maskL", maskL);
+           // cv::imshow("maskL", maskL);
             cv::findContours(maskL, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
             std::sort(contours.begin(), contours.end(), compareContourAreas);
             std::vector<cv::Point> cnt = contours[0];
@@ -228,7 +228,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             // Calculating the average depth of the object closer than the safe distance
 
             cv::meanStdDev(depth_left, mean, stddev, maskL);
-            cv::imshow("mask2", mask2);
+            //cv::imshow("mask2", mask2);
             ScreenLD->setValue(mean.at<double>(0,0)/60 - 0.66667); // Normalize
             cv::findContours(maskM, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
             std::sort(contours.begin(), contours.end(), compareContourAreas);
