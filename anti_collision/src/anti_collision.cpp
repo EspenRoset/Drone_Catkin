@@ -166,6 +166,7 @@ float analysis::CalcVy(cv::Rect b, float Vx)
     }
 }
 
+ 
 
 void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
 {
@@ -176,111 +177,76 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             disparity.convertTo(disparity,CV_8UC1,1.0);
             int dR = disparity.rows;
             int dC = disparity.cols;
-            disparity = disparity(cv::Range(0,dR),cv::Range(37, dC)); // Remove dead part of frame
+            disparity = disparity(cv::Range(0,dR),cv::Range(65, dC)); // Remove dead part of frame (37) and slice for equal FOV after
             cv::Mat output_canvas = this->output;
             cv::Mat depth_map = 6646.777f/disparity;
             depth_map +=21.669;
-            ROS_INFO_STREAM(disparity.cols);
-            cv::Mat mask, mean, stddev, mask2;
+            int sliceIndex = depth_map.cols/3;
+            cv::Mat depth_left = depth_map(cv::Range(0,dR),cv::Range(0, sliceIndex));
+            cv::Mat depth_mid = depth_map(cv::Range(0,dR),cv::Range(sliceIndex, 2*sliceIndex));
+            cv::Mat depth_right = depth_map(cv::Range(0,dR),cv::Range(2*sliceIndex, 3*sliceIndex));
+            cv::imshow("Left", depth_left);
+            cv::imshow("mid", depth_mid);
+            cv::imshow("right", depth_right);
+            cv::waitKey(1);
+            cv::Mat mask, mean, stddev, mask2, maskL, maskM, maskR;
             // Mask to segment regions with depth less than safe distance
-            cv::inRange(depth_map, 10, depth_thresh, mask);
-            double s = (cv::sum(mask)[0])/255.0;
+            //cv::inRange(depth_map, 10, depth_thresh, mask);
+            cv::inRange(depth_left, 40, depth_thresh, maskL);
+            cv::inRange(depth_mid, 40, depth_thresh, maskM);
+            cv::inRange(depth_right, 40, depth_thresh, maskR);
+            double sL = (cv::sum(maskL)[0])/255.0;
+            double sM = (cv::sum(maskM)[0])/255.0;
+            double sR = (cv::sum(maskR)[0])/255.0;
             double img_area = double(mask.rows * mask.cols);
+            double img_areaL = double(maskL.rows * maskL.cols);
+            double img_areaM = double(maskM.rows * maskM.cols);
+            double img_areaR = double(maskR.rows * maskR.cols);
+            screenLS = sL/img_areaL;
+            screenMS = sM/img_areaM;
+            screenRS = sR/img_areaR;
 
             std::vector<std::vector<cv::Point>> contours;
             std::vector<cv::Vec4i> hierarchy;
-            data[0] = 0;
-            data[1] = 0;
-            data[2] = 0;
-            // Check if a significantly large obstacle is present and filter out smaller noisy regions
-            if (s > 0.10*img_area)
-            {
-                // finding conoturs in the generated mask
-                cv::findContours(mask, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-                
-                // sorting contours from largest to smallest
-                std::sort(contours.begin(), contours.end(), compareContourAreas);
+            cv::imshow("maskL", maskL);
+            cv::findContours(maskL, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+            std::sort(contours.begin(), contours.end(), compareContourAreas);
+            std::vector<cv::Point> cnt = contours[0];
 
-                // extracting the largest contour
-                std::vector<cv::Point> cnt = contours[0];
+            mask2 = maskL*0;
+            cv::drawContours(mask2, contours, 0, (255), -1);
+            // Calculating the average depth of the object closer than the safe distance
 
-                // Check if detected contour is significantly large (to avoid multiple tiny regions)
-                double cnt_area = fabs( cv::contourArea(cv::Mat(cnt)));
-                if (cnt_area > 0.01*img_area)
-                {
-                    cv::Rect box;
-
-                    // Finding the bounding rectangle for the largest contour
-                    box = cv::boundingRect(cnt);
-                    
-                    // Update position and flag for detected object
-                    float boxX = box.x + box.width/2;
-                    float boxY = box.y + box.height/2;
-                    
-                    data[0] = boxX;
-                    
-                    data[2] = 1.0f;
-                    
-                    
-
-                    //finding average depth of region represented by the largest contour
-                    mask2 = mask*0;
-                    cv::drawContours(mask2, contours, 0, (255), -1);
-
-                    // Calculating the average depth of the object closer than the safe distance
-                    //ROS_INFO("PreDev");
-                    //replaceInf(depth_map);
-                    cv::meanStdDev(depth_map, mean, stddev, mask2);
-                    data[1] = mean.at<double>(0,0);
-                    data[5] = CalcVx(data[1]); //Calculate reversing speed
-                    data[6] = CalcVy(box,data[5]);
-
-                    //double minVal; 
-                    //double maxVal;
-
-                    // Printing the warning text with object distance
-                    //char text[10];
-                    //ROS_INFO_STREAM(mean2);
-                    //std::sprintf(text, "%.2f cm",mean.at<double>(0,0));
-                    //ROS_INFO_STREAM(depth_map);
-                    //cv::putText(output_canvas, "WARNING!", cv::Point2f(box.x + 5, box.y-40), 1, 2, cv::Scalar(0,0,255), 2, 2);
-                    //cv::putText(output_canvas, "Object at", cv::Point2f(box.x + 5, box.y), 1, 2, cv::Scalar(0,0,255), 2, 2);
-                    //cv::putText(output_canvas, text, cv::Point2f(box.x + 5, box.y+40), 1, 2, cv::Scalar(0,0,255), 2, 2);
-                    //ROS_INFO("STRANGER DANGER");
-                }
-            }
-            else
-            {
-                data[5] = 0; // Dont send reversing distance if there is no obstacle
-                data[6] = 0;
-                // Printing SAFE if no obstacle is closer than the safe distance
-                //cv::putText(output_canvas, "SAFE!", cv::Point2f(200,200),1,2,cv::Scalar(0,255,0),2,2);
-                
-            }
+            cv::meanStdDev(depth_left, mean, stddev, maskL);
+            cv::imshow("mask2", mask2);
+            screenLD = mean.at<double>(0,0);
+            cv::findContours(maskM, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+            std::sort(contours.begin(), contours.end(), compareContourAreas);
+            cnt = contours[0];
+            mask2 = maskM*0;
+            cv::drawContours(mask2, contours, 0, (255), -1);
+            cv::meanStdDev(depth_mid, mean, stddev, mask2);
+            screenMD = mean.at<double>(0,0);
             
-            verticalCheck(data);
-            detectedObject.data = data;
 
-            // Displaying the output of the obstacle avoidance system
-            
-            //cv::imshow("mask", disparity);
-            //cv::imshow("mask2", mask2);
-            //cv::imshow("output_canvas",output_canvas);
-            pub.publish(detectedObject);
-            //cv::waitKey(1);
-            ROS_INFO("Vector:");
-            ROS_INFO_STREAM(data[0]);
-            ROS_INFO_STREAM(data[1]);
-            ROS_INFO_STREAM(data[2]);
-            ROS_INFO_STREAM(data[3]);
-            ROS_INFO_STREAM(data[4]);
-            ROS_INFO_STREAM(data[5]);
-            ROS_INFO_STREAM(data[6]);
-        
-
-
-            
+            cv::findContours(maskR, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+            std::sort(contours.begin(), contours.end(), compareContourAreas);
+            cnt = contours[0];
+            screenRS = fabs( cv::contourArea(cv::Mat(cnt)))/(depth_right.cols*depth_right.rows);
+            mask2 = maskR*0;
+            cv::drawContours(mask2, contours, 0, (255), -1);
+            cv::meanStdDev(depth_right, mean, stddev, mask2);
+            screenRD = mean.at<double>(0,0);
+            ROS_INFO("Distance");
+            ROS_INFO_STREAM(screenLD);
+            ROS_INFO_STREAM(screenMD);
+            ROS_INFO_STREAM(screenRD);
+            ROS_INFO("Size");
+            ROS_INFO_STREAM(screenLS);
+            ROS_INFO_STREAM(screenMS);
+            ROS_INFO_STREAM(screenRS);
         }
+         
     catch(cv_bridge::Exception& e)
     {
         ROS_ERROR("Could not convert from '%s', to 'bgr8'.", msg->encoding.c_str());
