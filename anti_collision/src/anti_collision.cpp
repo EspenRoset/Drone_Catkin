@@ -7,11 +7,11 @@ std::vector<float> analysis::FuzzyGetVelocities(float maxRoll, float maxPitch){
     float FuzzyPitch = analysis::Pitch->getValue();
 
     //Scale Roll
-    velocities[1] = maxRoll*FuzzyRoll;
+    velocities[1] = (maxRoll/0.5)*FuzzyRoll-maxRoll;
     ROS_INFO("VELOCITITTIES");
     ROS_INFO_STREAM(velocities[1]);
     //Scale Pitch
-    velocities[0] = -maxPitch*FuzzyPitch;
+    velocities[0] = (-maxPitch/0.5)*FuzzyPitch-maxPitch;
     ROS_INFO_STREAM(velocities[0]);
 
     return velocities;
