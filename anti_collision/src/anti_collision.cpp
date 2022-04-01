@@ -17,7 +17,7 @@ std::vector<float> analysis::FuzzyGetVelocities(float maxRoll, float maxPitch){
     }
     else 
     {
-        velocities[0] = 0;
+        velocities[0] = 0.0f;
     }
     ROS_INFO_STREAM(velocities[0]);
 
@@ -247,6 +247,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             ScreenRD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize
 
             std::vector<float> v = analysis::FuzzyGetVelocities(maxRoll, maxPitch);
+            data[2] = 1.0f;
             data[5] = v[0];
             data[6] = v[1];
 
