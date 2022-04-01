@@ -161,6 +161,7 @@ void DroneControl::PX4Arm(){ // Arm quad and reset arm bool
 void DroneControl::DroneTakeoff(float altitude){ // Take off the drone and change mode to Flying
     if(ros::ok() && (current_position.pose.pose.position.z < altitude)){
         ROS_INFO_STREAM("Initiating Takeoff");
+        ROS_INFO_STREAM(current_position.pose.pose.position.z);
         TargetPosition.velocity.z = 0.5;
     }else {
     TargetPosition.velocity.z = 0;
