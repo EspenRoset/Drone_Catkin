@@ -40,6 +40,13 @@ class analysis
 
     public:
 
+    float screenLS;
+    float screenLD;
+    float screenMS;
+    float screenMD;
+    float screenRS;
+    float screenRD;
+
     float minDistRoof = 1500; // Minimum distance above drone  (mm)
     float minAltitude = 500;  // Minimum distance bellow drone (mm)
     float depth_thresh = 105;  // Threshold for SAFE distance (cm)
