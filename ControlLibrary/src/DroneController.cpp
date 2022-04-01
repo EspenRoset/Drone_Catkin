@@ -51,7 +51,7 @@ void DroneControl::RunDrone(){
                     ROS_INFO("Not armed or OFFBOARD Mode");
                     ROS_INFO_STREAM(current_state.mode);
                     ROS_INFO_STREAM(current_state.armed);
-                    state = Startup;
+                    //state = Startup;
                 }
             break;
         case 2 /*Flying*/: // Get input from controller and update Targetpotsiion
