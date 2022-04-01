@@ -1,5 +1,18 @@
 #include "../include/anti_collision/anti_collision.h"
 
+std::vector<float> analysis::FuzzyGetVelocities(float maxRoll, float maxPitch){
+    std::vector<float> velocities = {0,0};
+    analysis::engine->process();
+    float FuzzyRoll = analysis::Roll->getValue();
+    float FuzzyPitch = analysis::Pitch->getValue();
+
+    //Scale Roll
+    velocities[1] = maxRoll*FuzzyRoll;
+    //Scale Pitch
+    velocities[0] = -maxPitch*FuzzyPitch;
+
+    return velocities;
+}
 
 bool compareContourAreas ( std::vector<cv::Point> contour1, std::vector<cv::Point> contour2 ) {
     double i = fabs( cv::contourArea(cv::Mat(contour1)) );
@@ -278,6 +291,5 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
     }
     
 }
-
 
 

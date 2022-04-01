@@ -7,6 +7,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "opencv2/imgcodecs.hpp"
+#include <fl/Headers.h>
 #include <stdio.h>
 #include <iostream>
 #include <cv_bridge/cv_bridge.h>
@@ -35,7 +36,20 @@ class analysis
                                         //               fu = 1 to high           | fd = to low
     cv::Mat output;
     float sensorUp;             
-    float sensorDown;          
+    float sensorDown;
+
+    fl::Engine* engine = fl::FllImporter().fromFile("../src/ObstacleAvoidance.fll"); // Fuzzy engine
+
+    fl::InputVariable* ScreenLS = engine->getInputVariable("ScreenLS"); // Fuzzy inputs
+    fl::InputVariable* ScreenLD = engine->getInputVariable("ScreenLD");
+    fl::InputVariable* ScreenMS = engine->getInputVariable("ScreenMS");
+    fl::InputVariable* ScreenMD = engine->getInputVariable("ScreenMD");
+    fl::InputVariable* ScreenRS = engine->getInputVariable("ScreenRS");
+    fl::InputVariable* ScreenRD = engine->getInputVariable("ScreenRD");
+
+    fl::OutputVariable* Roll = engine->getOutputVariable("Roll"); // Fuzzy outputs 
+    fl::OutputVariable* Pitch = engine->getOutputVariable("Pitch");
+
     
 
     public:
@@ -75,6 +89,7 @@ class analysis
     void Calibration(const sensor_msgs::ImageConstPtr& msg);
     float CalcVx(double avgDistance);
     float CalcVy(cv::Rect b, float Vx);
+    std::vector<float> FuzzyGetVelocities(float maxRoll, float maxPitch);
     //bool compareContourAreas( std::vector<cv::Point> contour1, std::vector<cv::Point> contour2 );
     
 

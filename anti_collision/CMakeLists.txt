@@ -154,6 +154,7 @@ include_directories(
  target_link_libraries(${PROJECT_NAME}
    ${catkin_LIBRARIES}
    ${OpenCV_LIBRARIES}
+   fuzzylite
  )
 
 #############

@@ -1,0 +1,89 @@
+#File: ObstacleAvoidance.fll
+Engine: ObstacleAvoidance
+InputVariable: ScreenLS
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  term: nothing Trapezoid 0.000 0.000 0.100 0.250
+  term: small Triangle 0.100 0.200 0.300
+  term: medium Trapezoid 0.200 0.300 0.600 0.750
+  term: large Trapezoid 0.500 0.800 1.000 1.000
+InputVariable: ScreenLD
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  term: notSafe Trapezoid 0.000 0.000 0.500 0.800
+  term: safe Trapezoid 0.500 0.700 1.000 1.000
+
+InputVariable: ScreenMS
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  term: nothing Trapezoid 0.000 0.000 0.100 0.200
+  term: small Triangle 0.100 0.200 0.300
+  term: medium Trapezoid 0.200 0.300 0.600 0.750
+  term: large Trapezoid 0.500 0.800 1.000 1.000
+InputVariable: ScreenRD
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  term: notSafe Trapezoid 0.000 0.000 0.500 0.800
+
+InputVariable: ScreenRS
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  term: nothing Trapezoid 0.000 0.000 0.100 0.200
+  term: small Triangle 0.100 0.200 0.300
+  term: medium Trapezoid 0.200 0.300 0.600 0.750
+  term: large Trapezoid 0.500 0.800 1.000 1.000
+InputVariable: ScreenRD
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  term: notSafe Trapezoid 0.000 0.000 0.500 0.800
+
+
+OutputVariable: Roll
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  aggregation: Maximum
+  defuzzifier: Centroid 100
+  default: nan
+  lock-previous: false
+  term: hardLeft Trapezoid 0.000 0.000 0.150 0.300
+  term: left Triangle 0.200 0.350 0.500
+  term: stay Trapezoid 0.300 0.450 0.550 0.700
+  term: right Triangle 0.500 0.650 0.800
+  term: hardRight Trapezoid 0.700 0.850 1.000 1.000
+
+OutputVariable: Pitch
+enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  aggregation: Maximum
+  defuzzifier: Centroid 100
+  default: nan
+  lock-previous: false
+  term: stay Trapezoid 0.000 0.000 0.150 0.300
+  term: reverse Triangle 0.250 0.500 0.750
+  term: hardReverse Trapezoid 0.700 0.900 1.000 1.000
+
+RuleBlock: mamdani
+  enabled: true
+  conjunction: none
+  disjunction: none
+  implication: AlgebraicProduct
+  activation: General
+
+  rule: if ScreenLS is nothing then Roll is stay
+  rule: if ScreenLS is small then Roll ir right
+  rule: if ScreenLS is medium then Roll is right
+  rule: if ScreenLS is large then Roll is hardRight
+
+  rule: if ScreenRS is nothing then Roll is stay
+  rule: if ScreenRS is small then Roll is left
+  rule: if ScreenRS is medium then Roll is left
+  rule: if ScreenRS is large then Roll is hardLeft
+
