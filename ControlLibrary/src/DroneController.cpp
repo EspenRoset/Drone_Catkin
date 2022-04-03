@@ -32,11 +32,11 @@ void DroneControl::RunDrone(){
                 }
 
                 ROS_INFO_STREAM("Drone starting up");
-                DroneControl::SendNWaipoints(100); // Send some waypoints to prepare for mode change
+                DroneControl::SendNWaipoints(100); // Send somewaypoin ts to prepare for mode change
                 if (current_state.mode != "OFFBOARD"){
                     DroneControl::SetPX4Mode("OFFBOARD"); // Change mode to offboard
                 }
-
+                DroneControl::PX4Arm();
 
                 StartingHeight = current_position.pose.pose.position.z; //Reference height used for calcing takeoff height
                 ROS_INFO_STREAM("Waiting for Takeoff command (Rb + A)");
