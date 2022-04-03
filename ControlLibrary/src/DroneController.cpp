@@ -131,7 +131,6 @@ void DroneControl::SendNWaipoints(int n){ // Send n number of waypoints (used to
 
 void DroneControl::SetPX4Mode(std::string Mode){ // set given mode on px4
     offb_set_mode.request.custom_mode = Mode;
-    while(ros::ok() && current_state.mode != Mode){
         if (current_state.mode != Mode && (ros::Time::now() - last_request > ros::Duration(5.0)))
     {
       if (set_mode_client.call(offb_set_mode) && offb_set_mode.response.mode_sent)
@@ -140,12 +139,9 @@ void DroneControl::SetPX4Mode(std::string Mode){ // set given mode on px4
       }
       last_request = ros::Time::now();
     }
-    }
-
 }
 
 void DroneControl::PX4Arm(){ // Arm quad and reset arm bool
-    while(ros::ok() && !current_state.armed){
         if (!current_state.armed && (ros::Time::now() - last_request > ros::Duration(5.0)))
       {
         if (arming_client.call(arm_cmd) && arm_cmd.response.success)
@@ -154,19 +150,20 @@ void DroneControl::PX4Arm(){ // Arm quad and reset arm bool
         }
         last_request = ros::Time::now();
       }
-    }
     ArmDrone = false;
 }
 
 void DroneControl::DroneTakeoff(float altitude){ // Take off the drone and change mode to Flying
+    altitude = altitude + current_position.pose.pose.position.z;
     if(ros::ok() && (current_position.pose.pose.position.z < altitude)){
         ROS_INFO_STREAM("Initiating Takeoff");
         ROS_INFO_STREAM(current_position.pose.pose.position.z);
         TargetPosition.velocity.z = 0.5;
     }else {
-    TargetPosition.velocity.z = 0;
-    InitiateTakeoff = false;
-    state = Flying;
+        ROS_INFO_STREAM("Operating altitude reached");
+        TargetPosition.velocity.z = 0;
+        InitiateTakeoff = false;
+        state = Flying;
     }
 }
 
@@ -179,7 +176,7 @@ void DroneControl::DroneLand(){ // Land the drone and change mode to Startup
         }
     if (current_position.pose.pose.position.z < 0.1){
         InitiateLanding = false;
-        state = Startup;         
+        state = Landed;         
     }
 }
 
