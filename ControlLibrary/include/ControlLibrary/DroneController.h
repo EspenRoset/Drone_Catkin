@@ -38,6 +38,7 @@ class DroneControl{
         std::vector<float> Obstacle_position;
         float AvoidReverse = 0;
         float AvoidRoll = 0;
+        float StartingHeight = 0.0;
 
 
         ros::Subscriber state_sub;

@@ -1,6 +1,5 @@
 #include "../include/ControlLibrary/DroneController.h"
 
-//Github Test
 void DroneControl::state_cb(const mavros_msgs::State::ConstPtr& msg){
     current_state = *msg;
 }
@@ -28,30 +27,26 @@ void DroneControl::RunDrone(){
                 // Wait for arm command
                 ROS_INFO_STREAM("Waiting for start/arm command (Rb)");
                 {
-                std::unique_lock<std::mutex> lk(ArmMutex);
+                std::unique_lock<std::mutex> lk(ArmMutex); // Block here until user is ready
                 cv.wait(lk, [&]{return ArmDrone;});
                 }
+
+                ROS_INFO_STREAM("Drone starting up");
                 DroneControl::SendNWaipoints(100); // Send some waypoints to prepare for mode change
-                DroneControl::SetPX4Mode("OFFBOARD"); // Change mode to offboard
-                DroneControl::PX4Arm();
-                // Wait for takeoff command
-                ROS_INFO_STREAM("Waiting for Takeoff command (Rb + A)");
-                {
-                std::unique_lock<std::mutex> lk(ArmMutex);
-                cv.wait(lk, [&]{return InitiateTakeoff;});
+                if (current_state.mode != "OFFBOARD"){
+                    DroneControl::SetPX4Mode("OFFBOARD"); // Change mode to offboard
                 }
+
+
+                StartingHeight = current_position.pose.pose.position.z; //Reference height used for calcing takeoff height
+                ROS_INFO_STREAM("Waiting for Takeoff command (Rb + A)");
                 state = Takeoff;
+                
 
             break;
         case 1 /*TakeOff*/: // Check OFFBOARD and arm, Take off to flight altitude
-                if ((current_state.mode == "OFFBOARD") && (current_state.armed) /*&& !Roof_limit*/){
-                    DroneControl::DroneTakeoff(TakeoffAltitude); // Takes of and changes state to flying
-
-                } else{
-                    ROS_INFO("Not armed or OFFBOARD Mode");
-                    ROS_INFO_STREAM(current_state.mode);
-                    ROS_INFO_STREAM(current_state.armed);
-                    //state = Startup;
+                if (InitiateTakeoff /*&& !Roof_limit*/){
+                    DroneControl::DroneTakeoff(StartingHeight + TakeoffAltitude); // Takes of and changes state to flying
                 }
             break;
         case 2 /*Flying*/: // Get input from controller and update Targetpotsiion
@@ -59,8 +54,6 @@ void DroneControl::RunDrone(){
                 if (InitiateLanding){
                     state = Landing;
                 } if (Obstacle_detected || Roof_limit || Floor_limit){
-                    //EndTimeReverse = std::chrono::steady_clock::now() + std::chrono::milliseconds(300);
-                    //EndTimeReset = EndTimeReverse + std::chrono::seconds(10);
                     state = AvoidObstacle;
                 }
             break;
@@ -70,19 +63,20 @@ void DroneControl::RunDrone(){
         case 4 /*Landed*/: // Be ready to change mode to takeoff
                 ROS_INFO_STREAM("Landed and waiting");
                 ROS_INFO_STREAM("Press takeoff to fly");
-                DroneControl::SetPX4Mode("OFFBOARD"); // Change mode to offboard after drone is landed
-                {
-                std::unique_lock<std::mutex> lk(ArmMutex);
-                cv.wait(lk, [&]{return InitiateTakeoff;});
+
+                if (current_state.mode != "OFFBOARD"){
+                    DroneControl::SetPX4Mode("OFFBOARD"); // Change mode to offboard
+                }else {
+                    StartingHeight = current_position.pose.pose.position.z;
+                    state = Takeoff;
                 }
-                state = Takeoff;
             break;
         case 5 /*Avoid Obstacle*/: // Limit movement to avoid crashing
                 // Get input from Controller
                 TargetPosition = InputTargetPosition;
                 ROS_INFO_STREAM("Avoiding obstacle");
                 // Limit Movement
-                if (Obstacle_detected){ // USe velocities from anti_collision to avoid obstacle
+                if (Obstacle_detected){ // Use velocities from anti_collision to avoid obstacle
                     TargetPosition.velocity.x = TargetPosition.velocity.x + AvoidReverse;
                     TargetPosition.velocity.y = TargetPosition.velocity.y + AvoidRoll;
         
@@ -144,6 +138,7 @@ void DroneControl::SetPX4Mode(std::string Mode){ // set given mode on px4
 void DroneControl::PX4Arm(){ // Arm quad and reset arm bool
         if (!current_state.armed && (ros::Time::now() - last_request > ros::Duration(5.0)))
       {
+        ROS_INFO_STREAM("Trying to arm");
         if (arming_client.call(arm_cmd) && arm_cmd.response.success)
         {
           ROS_INFO("Vehicle armed");
@@ -154,13 +149,11 @@ void DroneControl::PX4Arm(){ // Arm quad and reset arm bool
 }
 
 void DroneControl::DroneTakeoff(float altitude){ // Take off the drone and change mode to Flying
-    altitude = altitude + current_position.pose.pose.position.z;
     if(ros::ok() && (current_position.pose.pose.position.z < altitude)){
         ROS_INFO_STREAM("Initiating Takeoff");
-        ROS_INFO_STREAM(current_position.pose.pose.position.z);
         TargetPosition.velocity.z = 0.5;
     }else {
-        ROS_INFO_STREAM("Operating altitude reached");
+        ROS_INFO_STREAM("Cruising altitude reached");
         TargetPosition.velocity.z = 0;
         InitiateTakeoff = false;
         state = Flying;
@@ -178,6 +171,7 @@ void DroneControl::DroneLand(){ // Land the drone and change mode to Startup
         InitiateLanding = false;
         state = Landed;         
     }
+
 }
 
 void DroneControl::ReverseDrone(int reversemillisec){
