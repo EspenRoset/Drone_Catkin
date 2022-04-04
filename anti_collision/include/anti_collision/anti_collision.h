@@ -32,9 +32,7 @@ class analysis
     image_transport::Publisher pubGrid;
 
     std_msgs::Float32MultiArray detectedObject;
-    std::vector<float> data{0,0,0,0,0,0,0}; // {x,y,f,fu,fd,vx,vy} x,y = location of object | f = 1 object is too close 
-                                        //               fu = 1 to high           | fd = to low
-    cv::Mat output;
+    std::vector<float> data{0,0,0,0}; // {vx,vy,fu,fd} vx = pitch, vy = roll, fu = flag up (too close roof), fd = flag down (too close ground)
     float sensorUp;             
     float sensorDown;
 
@@ -54,6 +52,7 @@ class analysis
 
     public:
 
+    cv::Mat output;
 
     float minDistRoof = 1500; // Minimum distance above drone  (mm)
     float minAltitude = 500;  // Minimum distance bellow drone (mm)

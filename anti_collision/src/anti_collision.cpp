@@ -6,19 +6,19 @@ void analysis::FuzzyGetVelocities(float maxRoll, float maxPitch){
     float FuzzyPitch = analysis::Pitch->getValue();
 
     //Scale Roll
-    data[6] = (maxRoll/0.5)*FuzzyRoll-maxRoll;
+    data[1] = (maxRoll/0.5)*FuzzyRoll-maxRoll;
     ROS_INFO("Speed Roll-Pitch:");
-    ROS_INFO_STREAM(data[6]);
+    ROS_INFO_STREAM(data[1]);
     //Scale Pitch
     if (FuzzyPitch>0.4f)
     {
-        data[5] = -maxPitch*FuzzyPitch;
+        data[0] = -maxPitch*FuzzyPitch;
     }
     else 
     {
-        data[5] = 0.0f;
+        data[0] = 0.0f;
     }
-    ROS_INFO_STREAM(data[5]);
+    ROS_INFO_STREAM(data[0]);
 }
 
 bool compareContourAreas ( std::vector<cv::Point> contour1, std::vector<cv::Point> contour2 ) {
@@ -103,14 +103,14 @@ void analysis::Calibration(const sensor_msgs::ImageConstPtr& msg){
 void analysis::verticalCheck(std::vector<float>& data)
 {
     if (sensorUp>minDistRoof){
+        data[2] = 0;
+    }else{
+        data[2] = 1;
+    }
+    if (sensorDown>minAltitude){
         data[3] = 0;
     }else{
         data[3] = 1;
-    }
-    if (sensorDown>minAltitude){
-        data[4] = 0;
-    }else{
-        data[4] = 1;
     }
 }
 
@@ -243,13 +243,12 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::meanStdDev(depth_right, mean, stddev, maskR);
             ScreenRD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize
 
+
             analysis::FuzzyGetVelocities(maxRoll, maxPitch);
-            data[2] = 1.0f;
-            ROS_INFO("1");
             verticalCheck(data);
+            
             detectedObject.data = data;
             pub.publish(detectedObject);
-            ROS_INFO("2");
 
 
         }
