@@ -54,6 +54,7 @@ class analysis
 
     cv::Mat output;
 
+    // Param Safety
     float minDistRoof = 1500; // Minimum distance above drone  (mm)
     float minAltitude = 500;  // Minimum distance bellow drone (mm)
     float depth_thresh = 105;  // Threshold for SAFE distance (cm)
@@ -63,13 +64,13 @@ class analysis
     float maxPitch = 1;
 
 
-    // Param REVERSE
+    // Param REVERSE // NOT IN USE!!
     float k1 = 1.3; // Max reverse speed
     float k2  = 0.5; // Distance when max reverse is applied
     float k3 = 2.5; // Adjust curve shape -> Higher value = Steeper curve 
     float Vx = 0; //Speed in x direction, to slow down drone
     
-    // Param ROLL
+    // Param ROLL // NOT IN USE!!
     int disparitry_center = 200; // Relative origo disparity map
     float k4 = 50; // Distance from origo considered safe
     float k5 = 0.005; // Gain roll - CAREFUL WITH THIS
@@ -85,20 +86,17 @@ class analysis
 
     }
 
-    void sensorup_update(const std_msgs::String &msg);
-    void sensordown_update(const std_msgs::String &msg);
-    void verticalCheck(std::vector<float>& data);
-    void detectobject(const sensor_msgs::ImageConstPtr& msg);
-    void gridview(const sensor_msgs::ImageConstPtr& msg);
-    void updateFrame1(const sensor_msgs::ImageConstPtr& msg);
-    void Calibration(const sensor_msgs::ImageConstPtr& msg);
-    float CalcVx(double avgDistance);
-    float CalcVy(cv::Rect b, float Vx);
-    void FuzzyGetVelocities(float maxRoll, float maxPitch);
-    //bool compareContourAreas( std::vector<cv::Point> contour1, std::vector<cv::Point> contour2 );
+    void sensorup_update(const std_msgs::String &msg); // IN USE
+    void sensordown_update(const std_msgs::String &msg); // IN USE
+    void verticalCheck(std::vector<float>& data); // IN USE
+    void detectobject(const sensor_msgs::ImageConstPtr& msg); // IN USE
+    void gridview(const sensor_msgs::ImageConstPtr& msg); // NOT
+    void updateFrame1(const sensor_msgs::ImageConstPtr& msg); // NOT
+    void Calibration(const sensor_msgs::ImageConstPtr& msg); // NOT
+    float CalcVx(double avgDistance); // NOT
+    float CalcVy(cv::Rect b, float Vx); //NOT
+    void FuzzyGetVelocities(float maxRoll, float maxPitch); // IN USE
     
-
-
 };
 
 

@@ -29,6 +29,7 @@ bool compareContourAreas ( std::vector<cv::Point> contour1, std::vector<cv::Poin
 
 void analysis::updateFrame1(const sensor_msgs::ImageConstPtr& msg)
 {
+    // NOT IN USE!!
     cv::Mat img = cv_bridge::toCvShare(msg, "bgr8")->image;
     int dR = img.rows;
     int dC = img.cols;  
@@ -50,6 +51,7 @@ void analysis::sensordown_update(const std_msgs::String &msg)
 
 void analysis::gridview(const sensor_msgs::ImageConstPtr& msg)
 {
+    // NOT IN USE!!
     cv::Mat disparity = cv_bridge::toCvShare(msg, "mono8")->image;
     disparity.convertTo(disparity,CV_8UC1,1.0);
     int N = 60;
@@ -70,6 +72,7 @@ void analysis::gridview(const sensor_msgs::ImageConstPtr& msg)
 }
 
 void analysis::Calibration(const sensor_msgs::ImageConstPtr& msg){
+    // NOT IN USE!!
     cv::Mat disparity = cv_bridge::toCvShare(msg, "mono8")->image;
     disparity.convertTo(disparity,CV_8UC1,1.0);
     int r = disparity.rows;
@@ -103,18 +106,19 @@ void analysis::Calibration(const sensor_msgs::ImageConstPtr& msg){
 void analysis::verticalCheck(std::vector<float>& data)
 {
     if (sensorUp>minDistRoof){
-        data[2] = 0;
+        data[2] = 0; // Distance form roof is SAFE
     }else{
-        data[2] = 1;
+        data[2] = 1; // Distance from roof is NOT SAFE
     }
     if (sensorDown>minAltitude){
-        data[3] = 0;
+        data[3] = 0; // Distance from floor is SAFE
     }else{
-        data[3] = 1;
+        data[3] = 1; // Distance from floor is too low, recommend increased altitude
     }
 }
 
 float analysis::CalcVx(double avgDistance){
+    // NOT IN USE!!
     Vx = -k1 * std::exp(k3*(k2-(avgDistance*0.01)));
     return Vx;
 }
@@ -122,6 +126,7 @@ float analysis::CalcVx(double avgDistance){
 
 float analysis::CalcVy(cv::Rect b, float Vx)
 {
+    // NOT IN USE!!
     //  -----Sl----disparity_center----Sr-----  //
     //  -------xl----------------xr-----------  //
     //          ----ll----|--lr---              //
@@ -173,80 +178,80 @@ float analysis::CalcVy(cv::Rect b, float Vx)
     }
 }
 
- 
+
 
 void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
 {
     try
     
         {
+            // Acquire and trim disparity map
             cv::Mat disparity = cv_bridge::toCvShare(msg, "mono8")->image;
             disparity.convertTo(disparity,CV_8UC1,1.0);
             int dR = disparity.rows;
             int dC = disparity.cols;
             disparity = disparity(cv::Range(0,dR),cv::Range(65, dC)); // Remove dead part of frame (37) and slice for equal FOV after
-            cv::Mat output_canvas = this->output;
+
             cv::Mat depth_map = 6646.777f/disparity;
             depth_map +=21.669;
+            // Split into three equal separate depth maps Left(L), Mid(M), Right(R)
             int sliceIndex = depth_map.cols/3;
             cv::Mat depth_left = depth_map(cv::Range(0,dR),cv::Range(0, sliceIndex));
             cv::Mat depth_mid = depth_map(cv::Range(0,dR),cv::Range(sliceIndex, 2*sliceIndex));
             cv::Mat depth_right = depth_map(cv::Range(0,dR),cv::Range(2*sliceIndex, 3*sliceIndex));
-            //cv::imshow("Left", depth_left);
-            //cv::imshow("mid", depth_mid);
-            //cv::imshow("right", depth_right);
-            //cv::waitKey(1);
-            cv::Mat mask, mean, stddev, mask2, maskL, maskM, maskR;
+
+            cv::Mat mean, stddev, mask, maskL, maskM, maskR;
             // Mask to segment regions with depth less than safe distance
-            //cv::inRange(depth_map, 10, depth_thresh, mask);
             cv::inRange(depth_left, 40, depth_thresh, maskL);
             cv::inRange(depth_mid, 40, depth_thresh, maskM);
             cv::inRange(depth_right, 40, depth_thresh, maskR);
+
             double sL = (cv::sum(maskL)[0])/255.0;
             double sM = (cv::sum(maskM)[0])/255.0;
             double sR = (cv::sum(maskR)[0])/255.0;
-            double img_area = double(mask.rows * mask.cols);
+
             double img_areaL = double(maskL.rows * maskL.cols);
             double img_areaM = double(maskM.rows * maskM.cols);
             double img_areaR = double(maskR.rows * maskR.cols);
+
             ScreenLS->setValue(sL/img_areaL);
             ScreenMS->setValue(sM/img_areaM);
-            ScreenRS->setValue( sR/img_areaR);
+            ScreenRS->setValue(sR/img_areaR);
 
             std::vector<std::vector<cv::Point>> contours;
             std::vector<cv::Vec4i> hierarchy;
-           // cv::imshow("maskL", maskL);
+
+            // Find contours for Left
             cv::findContours(maskL, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-            std::sort(contours.begin(), contours.end(), compareContourAreas);
-            std::vector<cv::Point> cnt = contours[0];
-
-            mask2 = maskL*0;
-            cv::drawContours(mask2, contours, 0, (255), -1);
-            // Calculating the average depth of the object closer than the safe distance
-
-            cv::meanStdDev(depth_left, mean, stddev, maskL);
-            //cv::imshow("mask2", mask2);
+            // New blank mask with same size
+            mask = maskL*0;
+            // Draw the contour on the blank mask2
+            cv::drawContours(mask, contours, 0, (255), -1);
+            // Calculating the average depth of the masked area
+            cv::meanStdDev(depth_left, mean, stddev, mask);
+            // Set parameter on fuzzy regulator
             ScreenLD->setValue(mean.at<double>(0,0)/60 - 0.66667); // Normalize
+
+            // Repeat above step for M and R
+
+            // M
             cv::findContours(maskM, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-            std::sort(contours.begin(), contours.end(), compareContourAreas);
-            cnt = contours[0];
-            cv::drawContours(mask2, contours, 0, (255), -1);
-            cv::meanStdDev(depth_mid, mean, stddev, maskM);
-            ScreenMD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize
-            
-
+            mask = maskM*0;
+            cv::drawContours(mask, contours, 0, (255), -1);
+            cv::meanStdDev(depth_mid, mean, stddev, mask);
+            ScreenMD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize [0-1]
+            // R
             cv::findContours(maskR, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-            std::sort(contours.begin(), contours.end(), compareContourAreas);
-            cnt = contours[0];
-            
-            cv::drawContours(mask2, contours, 0, (255), -1);
-            cv::meanStdDev(depth_right, mean, stddev, maskR);
-            ScreenRD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize
+            mask = maskL*0;
+            cv::drawContours(mask, contours, 0, (255), -1);
+            cv::meanStdDev(depth_right, mean, stddev, mask);
+            ScreenRD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize [0-1]
 
-
+            // Compute
             analysis::FuzzyGetVelocities(maxRoll, maxPitch);
             verticalCheck(data);
             
+            // Update message and publish
             detectedObject.data = data;
             pub.publish(detectedObject);
 
