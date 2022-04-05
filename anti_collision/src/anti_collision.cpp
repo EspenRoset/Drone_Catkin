@@ -180,20 +180,22 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
     try
     
         {
+            // Acquire and trim disparity map
             cv::Mat disparity = cv_bridge::toCvShare(msg, "mono8")->image;
             disparity.convertTo(disparity,CV_8UC1,1.0);
             int dR = disparity.rows;
             int dC = disparity.cols;
             disparity = disparity(cv::Range(0,dR),cv::Range(65, dC)); // Remove dead part of frame (37) and slice for equal FOV after
-            cv::Mat output_canvas = this->output;
+
             cv::Mat depth_map = 6646.777f/disparity;
             depth_map +=21.669;
+            // Split into three equal separate depth maps Left(L), Mid(M), Right(R)
             int sliceIndex = depth_map.cols/3;
             cv::Mat depth_left = depth_map(cv::Range(0,dR),cv::Range(0, sliceIndex));
             cv::Mat depth_mid = depth_map(cv::Range(0,dR),cv::Range(sliceIndex, 2*sliceIndex));
             cv::Mat depth_right = depth_map(cv::Range(0,dR),cv::Range(2*sliceIndex, 3*sliceIndex));
 
-            cv::Mat mask, mean, stddev, mask2, maskL, maskM, maskR;
+            cv::Mat mean, stddev, mask, maskL, maskM, maskR;
             // Mask to segment regions with depth less than safe distance
             cv::inRange(depth_left, 40, depth_thresh, maskL);
             cv::inRange(depth_mid, 40, depth_thresh, maskM);
@@ -209,39 +211,42 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
 
             ScreenLS->setValue(sL/img_areaL);
             ScreenMS->setValue(sM/img_areaM);
-            ScreenRS->setValue( sR/img_areaR);
+            ScreenRS->setValue(sR/img_areaR);
 
             std::vector<std::vector<cv::Point>> contours;
             std::vector<cv::Vec4i> hierarchy;
 
-            // Find contours
+            // Find contours for Left
             cv::findContours(maskL, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-            // New blank mask2 with same size
-            mask2 = maskL*0;
+            // New blank mask with same size
+            mask = maskL*0;
             // Draw the contour on the blank mask2
-            cv::drawContours(mask2, contours, 0, (255), -1);
+            cv::drawContours(mask, contours, 0, (255), -1);
             // Calculating the average depth of the masked area
-            cv::meanStdDev(depth_left, mean, stddev, mask2);
+            cv::meanStdDev(depth_left, mean, stddev, mask);
             // Set parameter on fuzzy regulator
             ScreenLD->setValue(mean.at<double>(0,0)/60 - 0.66667); // Normalize
 
+            // Repeat above step for M and R
+
+            // M
             cv::findContours(maskM, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-            mask2 = maskM*0;
-            cv::drawContours(mask2, contours, 0, (255), -1);
-            cv::meanStdDev(depth_mid, mean, stddev, mask2);
-            ScreenMD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize
-            
-
+            mask = maskM*0;
+            cv::drawContours(mask, contours, 0, (255), -1);
+            cv::meanStdDev(depth_mid, mean, stddev, mask);
+            ScreenMD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize [0-1]
+            // R
             cv::findContours(maskR, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-            mask2 = maskL*0;
-            cv::drawContours(mask2, contours, 0, (255), -1);
-            cv::meanStdDev(depth_right, mean, stddev, mask2);
-            ScreenRD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize
+            mask = maskL*0;
+            cv::drawContours(mask, contours, 0, (255), -1);
+            cv::meanStdDev(depth_right, mean, stddev, mask);
+            ScreenRD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize [0-1]
 
-
+            // Compute
             analysis::FuzzyGetVelocities(maxRoll, maxPitch);
             verticalCheck(data);
             
+            // Update message and publish
             detectedObject.data = data;
             pub.publish(detectedObject);
 
