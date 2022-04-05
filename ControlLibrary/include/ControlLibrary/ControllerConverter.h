@@ -29,6 +29,7 @@ class ControllerConverter{
     int landBtn = 0;
     int armingBtn = 0;
     int takeoffBtn = 0;
+    int returnBtn = 0;
     std::thread UpdateThread;
 
 
@@ -36,6 +37,7 @@ class ControllerConverter{
     bool Land = false;
     bool Takeoff = false;
     bool Arm = false;
+    bool Return = false;
     mavros_msgs::PositionTarget Target; 
 
     ControllerConverter(ros::NodeHandle& n, ros::Rate& rate){

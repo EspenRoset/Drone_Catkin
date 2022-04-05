@@ -14,6 +14,7 @@ void ControllerConverter::ControlUpdate(const sensor_msgs::JoyConstPtr& msg){
  ControllerConverter::takeoffBtn = msg->buttons[0];
  ControllerConverter::landBtn = msg->buttons[1];
  ControllerConverter::armingBtn = msg->buttons[5];
+ ControllerConverter::returnBtn = msg->buttons[2];
  if (armingBtn){
      Arm = true;
  } else{
@@ -28,6 +29,11 @@ void ControllerConverter::ControlUpdate(const sensor_msgs::JoyConstPtr& msg){
      Takeoff = true;
  } else{
      Takeoff = false;
+ }
+ if (armingBtn && returnBtn){
+     Return = true;
+ } else{
+     Return = false;
  }
 }
 
