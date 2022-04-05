@@ -29,6 +29,7 @@ bool compareContourAreas ( std::vector<cv::Point> contour1, std::vector<cv::Poin
 
 void analysis::updateFrame1(const sensor_msgs::ImageConstPtr& msg)
 {
+    // NOT IN USE!!
     cv::Mat img = cv_bridge::toCvShare(msg, "bgr8")->image;
     int dR = img.rows;
     int dC = img.cols;  
@@ -50,6 +51,7 @@ void analysis::sensordown_update(const std_msgs::String &msg)
 
 void analysis::gridview(const sensor_msgs::ImageConstPtr& msg)
 {
+    // NOT IN USE!!
     cv::Mat disparity = cv_bridge::toCvShare(msg, "mono8")->image;
     disparity.convertTo(disparity,CV_8UC1,1.0);
     int N = 60;
@@ -70,6 +72,7 @@ void analysis::gridview(const sensor_msgs::ImageConstPtr& msg)
 }
 
 void analysis::Calibration(const sensor_msgs::ImageConstPtr& msg){
+    // NOT IN USE!!
     cv::Mat disparity = cv_bridge::toCvShare(msg, "mono8")->image;
     disparity.convertTo(disparity,CV_8UC1,1.0);
     int r = disparity.rows;
@@ -103,18 +106,19 @@ void analysis::Calibration(const sensor_msgs::ImageConstPtr& msg){
 void analysis::verticalCheck(std::vector<float>& data)
 {
     if (sensorUp>minDistRoof){
-        data[2] = 0;
+        data[2] = 0; // Distance form roof is SAFE
     }else{
-        data[2] = 1;
+        data[2] = 1; // Distance from roof is NOT SAFE
     }
     if (sensorDown>minAltitude){
-        data[3] = 0;
+        data[3] = 0; // Distance from floor is SAFE
     }else{
-        data[3] = 1;
+        data[3] = 1; // Distance from floor is too low, recommend increased altitude
     }
 }
 
 float analysis::CalcVx(double avgDistance){
+    // NOT IN USE!!
     Vx = -k1 * std::exp(k3*(k2-(avgDistance*0.01)));
     return Vx;
 }
@@ -122,6 +126,7 @@ float analysis::CalcVx(double avgDistance){
 
 float analysis::CalcVy(cv::Rect b, float Vx)
 {
+    // NOT IN USE!!
     //  -----Sl----disparity_center----Sr-----  //
     //  -------xl----------------xr-----------  //
     //          ----ll----|--lr---              //
