@@ -173,7 +173,7 @@ float analysis::CalcVy(cv::Rect b, float Vx)
     }
 }
 
- 
+
 
 void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
 {
@@ -192,55 +192,50 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::Mat depth_left = depth_map(cv::Range(0,dR),cv::Range(0, sliceIndex));
             cv::Mat depth_mid = depth_map(cv::Range(0,dR),cv::Range(sliceIndex, 2*sliceIndex));
             cv::Mat depth_right = depth_map(cv::Range(0,dR),cv::Range(2*sliceIndex, 3*sliceIndex));
-            //cv::imshow("Left", depth_left);
-            //cv::imshow("mid", depth_mid);
-            //cv::imshow("right", depth_right);
-            //cv::waitKey(1);
+
             cv::Mat mask, mean, stddev, mask2, maskL, maskM, maskR;
             // Mask to segment regions with depth less than safe distance
-            //cv::inRange(depth_map, 10, depth_thresh, mask);
             cv::inRange(depth_left, 40, depth_thresh, maskL);
             cv::inRange(depth_mid, 40, depth_thresh, maskM);
             cv::inRange(depth_right, 40, depth_thresh, maskR);
+
             double sL = (cv::sum(maskL)[0])/255.0;
             double sM = (cv::sum(maskM)[0])/255.0;
             double sR = (cv::sum(maskR)[0])/255.0;
-            double img_area = double(mask.rows * mask.cols);
+
             double img_areaL = double(maskL.rows * maskL.cols);
             double img_areaM = double(maskM.rows * maskM.cols);
             double img_areaR = double(maskR.rows * maskR.cols);
+
             ScreenLS->setValue(sL/img_areaL);
             ScreenMS->setValue(sM/img_areaM);
             ScreenRS->setValue( sR/img_areaR);
 
             std::vector<std::vector<cv::Point>> contours;
             std::vector<cv::Vec4i> hierarchy;
-           // cv::imshow("maskL", maskL);
+
+            // Find contours
             cv::findContours(maskL, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-            std::sort(contours.begin(), contours.end(), compareContourAreas);
-            std::vector<cv::Point> cnt = contours[0];
-
+            // New blank mask2 with same size
             mask2 = maskL*0;
+            // Draw the contour on the blank mask2
             cv::drawContours(mask2, contours, 0, (255), -1);
-            // Calculating the average depth of the object closer than the safe distance
-
-            cv::meanStdDev(depth_left, mean, stddev, maskL);
-            //cv::imshow("mask2", mask2);
+            // Calculating the average depth of the masked area
+            cv::meanStdDev(depth_left, mean, stddev, mask2);
+            // Set parameter on fuzzy regulator
             ScreenLD->setValue(mean.at<double>(0,0)/60 - 0.66667); // Normalize
+
             cv::findContours(maskM, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-            std::sort(contours.begin(), contours.end(), compareContourAreas);
-            cnt = contours[0];
+            mask2 = maskM*0;
             cv::drawContours(mask2, contours, 0, (255), -1);
-            cv::meanStdDev(depth_mid, mean, stddev, maskM);
+            cv::meanStdDev(depth_mid, mean, stddev, mask2);
             ScreenMD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize
             
 
             cv::findContours(maskR, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-            std::sort(contours.begin(), contours.end(), compareContourAreas);
-            cnt = contours[0];
-            
+            mask2 = maskL*0;
             cv::drawContours(mask2, contours, 0, (255), -1);
-            cv::meanStdDev(depth_right, mean, stddev, maskR);
+            cv::meanStdDev(depth_right, mean, stddev, mask2);
             ScreenRD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize
 
 
