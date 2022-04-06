@@ -121,44 +121,28 @@ void DroneControl::RunDrone(){
                 }
             break;
         case 6 /*ReturnHome*/: //Follow waypoints back home
-            ROS_INFO("1");
             ChangeToLocalFrame();
-            ROS_INFO("2");
             CalcYawRate(); // Keep drone pointing towards next point
-            ROS_INFO("3");
             while (check_position(ReturnWaypoints.back(), 0.5 && ReturnWaypoints.size() > 1)){
                 ROS_INFO_STREAM("Going to the next waypoint");
                 ReturnWaypoints.pop_back();
-                ROS_INFO("4");
             }
-            ROS_INFO("5");
             TargetPosition.position.x = ReturnWaypoints.back()[0];
             TargetPosition.position.y = ReturnWaypoints.back()[1];
             TargetPosition.position.z = ReturnWaypoints.back()[2];
-            ROS_INFO("6");
             TargetPosition.yaw_rate = 0;
-            ROS_INFO("7");
 
             if (ReturnWaypoints.size() <= 1){
-                ROS_INFO("8");
                 InitiateReturn = false;
-                ROS_INFO("9");
                 ChangeToBodyFrame();
-                ROS_INFO("10");
                 state = Landing;
             }
-            ROS_INFO("11");
             if (InitiateTakeoff){
-                ROS_INFO("12");
                 InitiateReturn = false;
-                ROS_INFO("13");
                 InitiateTakeoff = false;
-                ROS_INFO("14");
                 ChangeToBodyFrame();
-                ROS_INFO("15");
                 state = Flying;
             }
-            ROS_INFO("16");
 
             break;
         default: // Maybe do something
@@ -249,16 +233,11 @@ void DroneControl::ReverseDrone(int reversemillisec){
 }
 
 bool DroneControl::check_position(std::vector<double> pos, double ErrorTolerance){
-  ROS_INFO("CP1");
   double Errorx = pos[0] - current_position.pose.pose.position.x;
-  ROS_INFO("CP2");
   double Errory = pos[1] - current_position.pose.pose.position.y;
-  ROS_INFO("CP3");
   double Errorz = pos[2] - current_position.pose.pose.position.z;
-  ROS_INFO("CP4");
 
   double magnitude = std::sqrt((Errorx * Errorx) + (Errory * Errory) + (Errorz * Errorz));
-  ROS_INFO("CP5");
  
   if (magnitude < ErrorTolerance)
   {
@@ -268,7 +247,6 @@ bool DroneControl::check_position(std::vector<double> pos, double ErrorTolerance
   {
     return false;
   }
-  ROS_INFO("CP6");
 
 }
 
