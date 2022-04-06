@@ -50,7 +50,7 @@ void DroneControl::RunDrone(){
                 StartingHeight = current_position.pose.pose.position.z; //Reference height used for calcing takeoff height
                 ROS_INFO_STREAM("Waiting for Takeoff command (Rb + A)");
                 state = Takeoff;
-                
+
 
             break;
         case 1 /*TakeOff*/: // Check OFFBOARD and arm, Take off to flight altitude
@@ -121,36 +121,51 @@ void DroneControl::RunDrone(){
                 }
             break;
         case 6 /*ReturnHome*/: //Follow waypoints back home
+            ROS_INFO("1");
             ChangeToLocalFrame();
+            ROS_INFO("2");
             CalcYawRate(); // Keep drone pointing towards next point
-            while (check_position(ReturnWaypoints.back(), 0.5)){
+            ROS_INFO("3");
+            while (check_position(ReturnWaypoints.back(), 0.5 && ReturnWaypoints.size() > 1)){
                 ROS_INFO_STREAM("Going to the next waypoint");
                 ReturnWaypoints.pop_back();
+                ROS_INFO("4");
             }
+            ROS_INFO("5");
             TargetPosition.position.x = ReturnWaypoints.back()[0];
             TargetPosition.position.y = ReturnWaypoints.back()[1];
             TargetPosition.position.z = ReturnWaypoints.back()[2];
+            ROS_INFO("6");
             TargetPosition.yaw_rate = 0;
+            ROS_INFO("7");
 
             if (ReturnWaypoints.size() <= 1){
+                ROS_INFO("8");
                 InitiateReturn = false;
+                ROS_INFO("9");
                 ChangeToBodyFrame();
+                ROS_INFO("10");
                 state = Landing;
             }
-
+            ROS_INFO("11");
             if (InitiateTakeoff){
+                ROS_INFO("12");
                 InitiateReturn = false;
+                ROS_INFO("13");
                 InitiateTakeoff = false;
+                ROS_INFO("14");
                 ChangeToBodyFrame();
+                ROS_INFO("15");
                 state = Flying;
             }
+            ROS_INFO("16");
 
             break;
         default: // Maybe do something
             break;
         }
         
-        if(!check_position(ReturnWaypoints.back(), 0.1)){
+        if((state != ReturnHome) && !check_position(ReturnWaypoints.back(), 0.1)){
             AddWaypoint();
         }
         pos_pub.publish(TargetPosition);
@@ -234,12 +249,17 @@ void DroneControl::ReverseDrone(int reversemillisec){
 }
 
 bool DroneControl::check_position(std::vector<double> pos, double ErrorTolerance){
+  ROS_INFO("CP1");
   double Errorx = pos[0] - current_position.pose.pose.position.x;
+  ROS_INFO("CP2");
   double Errory = pos[1] - current_position.pose.pose.position.y;
+  ROS_INFO("CP3");
   double Errorz = pos[2] - current_position.pose.pose.position.z;
+  ROS_INFO("CP4");
 
   double magnitude = std::sqrt((Errorx * Errorx) + (Errory * Errory) + (Errorz * Errorz));
-
+  ROS_INFO("CP5");
+ 
   if (magnitude < ErrorTolerance)
   {
     return true;
@@ -248,13 +268,18 @@ bool DroneControl::check_position(std::vector<double> pos, double ErrorTolerance
   {
     return false;
   }
+  ROS_INFO("CP6");
+
 }
 
 void DroneControl::ResetWaypoints(){
+    ROS_INFO("Before clear()");
     ReturnWaypoints.clear();
+    ROS_INFO("After clear()");
 }
 
 void DroneControl::AddWaypoint(){
+    ROS_INFO("Before try statement");
     try{
     ReturnWaypoints.push_back({
         current_position.pose.pose.position.x,
@@ -279,12 +304,12 @@ float DroneControl::CalcYawRate(){
 
     float dot = x1*x2 + y1*y2;      // dot product between [x1, y1] and [x2, y2]
     float det = x1*y2 - y1*x2;      // determinant
-    float angle = std::atan2(det, dot)+3.14159265359;  // atan2(y, x) or atan2(sin, cos)
+    float angle = std::atan2(det, dot); //+3.14159265359;  // atan2(y, x) or atan2(sin, cos)
     TargetPosition.yaw = angle;
     return angle;
 }
 
-void DroneControl::ChangeToBodyFrame(){
+void DroneControl::ChangeToBodyFrame(){ // Change to body frame when sending velocity setpoints
     TargetPosition.coordinate_frame = mavros_msgs::PositionTarget::FRAME_BODY_NED;
     TargetPosition.type_mask = 1024; // Ingoring yaw angle, using yaw rate
     TargetPosition.position.x = 0;
@@ -292,7 +317,7 @@ void DroneControl::ChangeToBodyFrame(){
     TargetPosition.position.z = 0;
 }
 
-void DroneControl::ChangeToLocalFrame(){
+void DroneControl::ChangeToLocalFrame(){ // Change to Local(world) frame when sending position setpoints
     TargetPosition.coordinate_frame = mavros_msgs::PositionTarget::FRAME_LOCAL_NED;
     TargetPosition.velocity.x = 0;
     TargetPosition.velocity.y = 0;

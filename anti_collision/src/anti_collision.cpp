@@ -1,24 +1,32 @@
 #include "../include/anti_collision/anti_collision.h"
 
-void analysis::FuzzyGetVelocities(float maxRoll, float maxPitch){
+void analysis::FuzzyGetVelocities(float maxRoll, float maxPitch){   
+    ROS_INFO("F1");
     analysis::engine->process();
     float FuzzyRoll = analysis::Roll->getValue();
     float FuzzyPitch = analysis::Pitch->getValue();
-
+    ROS_INFO("F2");
     //Scale Roll
     data[1] = (maxRoll/0.5)*FuzzyRoll-maxRoll;
     ROS_INFO("Speed Roll-Pitch:");
     ROS_INFO_STREAM(data[1]);
+    ROS_INFO("F3");
     //Scale Pitch
     if (FuzzyPitch>0.4f)
     {
         data[0] = -maxPitch*FuzzyPitch;
+        ROS_INFO("F4");
+
     }
     else 
     {
         data[0] = 0.0f;
+        ROS_INFO("F5");
+        
     }
     ROS_INFO_STREAM(data[0]);
+    ROS_INFO("F6");
+
 }
 
 bool compareContourAreas ( std::vector<cv::Point> contour1, std::vector<cv::Point> contour2 ) {
@@ -185,13 +193,14 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
     try
     
         {
+            ROS_INFO("1");
             // Acquire and trim disparity map
             cv::Mat disparity = cv_bridge::toCvShare(msg, "mono8")->image;
             disparity.convertTo(disparity,CV_8UC1,1.0);
             int dR = disparity.rows;
             int dC = disparity.cols;
             disparity = disparity(cv::Range(0,dR),cv::Range(65, dC)); // Remove dead part of frame (37) and slice for equal FOV after
-
+            ROS_INFO("2");
             cv::Mat depth_map = 6646.777f/disparity;
             depth_map +=21.669;
             // Split into three equal separate depth maps Left(L), Mid(M), Right(R)
@@ -199,28 +208,28 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::Mat depth_left = depth_map(cv::Range(0,dR),cv::Range(0, sliceIndex));
             cv::Mat depth_mid = depth_map(cv::Range(0,dR),cv::Range(sliceIndex, 2*sliceIndex));
             cv::Mat depth_right = depth_map(cv::Range(0,dR),cv::Range(2*sliceIndex, 3*sliceIndex));
-
+            ROS_INFO("3");
             cv::Mat mean, stddev, mask, maskL, maskM, maskR;
             // Mask to segment regions with depth less than safe distance
             cv::inRange(depth_left, 40, depth_thresh, maskL);
             cv::inRange(depth_mid, 40, depth_thresh, maskM);
             cv::inRange(depth_right, 40, depth_thresh, maskR);
-
+            ROS_INFO("4");
             double sL = (cv::sum(maskL)[0])/255.0;
             double sM = (cv::sum(maskM)[0])/255.0;
             double sR = (cv::sum(maskR)[0])/255.0;
-
+            ROS_INFO("5");
             double img_areaL = double(maskL.rows * maskL.cols);
             double img_areaM = double(maskM.rows * maskM.cols);
             double img_areaR = double(maskR.rows * maskR.cols);
-
+            ROS_INFO("6");
             ScreenLS->setValue(sL/img_areaL);
             ScreenMS->setValue(sM/img_areaM);
             ScreenRS->setValue(sR/img_areaR);
-
+            ROS_INFO("7");
             std::vector<std::vector<cv::Point>> contours;
             std::vector<cv::Vec4i> hierarchy;
-
+            ROS_INFO("8");
             // Find contours for Left
             cv::findContours(maskL, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
             // New blank mask with same size
@@ -231,7 +240,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::meanStdDev(depth_left, mean, stddev, mask);
             // Set parameter on fuzzy regulator
             ScreenLD->setValue(mean.at<double>(0,0)/60 - 0.66667); // Normalize
-
+            ROS_INFO("8");
             // Repeat above step for M and R
 
             // M
@@ -240,20 +249,23 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::drawContours(mask, contours, 0, (255), -1);
             cv::meanStdDev(depth_mid, mean, stddev, mask);
             ScreenMD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize [0-1]
-            // R
+            ROS_INFO("9"); // RR
             cv::findContours(maskR, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
             mask = maskL*0;
             cv::drawContours(mask, contours, 0, (255), -1);
             cv::meanStdDev(depth_right, mean, stddev, mask);
             ScreenRD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize [0-1]
+            ROS_INFO("10");
 
             // Compute
             analysis::FuzzyGetVelocities(maxRoll, maxPitch);
             verticalCheck(data);
+            ROS_INFO("11");
             
             // Update message and publish
             detectedObject.data = data;
             pub.publish(detectedObject);
+            ROS_INFO("12");
 
 
         }
