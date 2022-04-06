@@ -40,6 +40,7 @@ class DroneControl{
         std::vector<float> Obstacle_position;
         float AvoidReverse = 0;
         float AvoidRoll = 0;
+        float AvoidYawRate = 0;
         float StartingHeight = 0.0;
         std::vector<std::vector<double>> ReturnWaypoints = {};
         double roll, pitch, yaw;

@@ -22,6 +22,7 @@ void DroneControl::collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg
     Floor_limit = static_cast<int>(msg->data[3]);
     AvoidReverse = msg->data[0];
     AvoidRoll = msg->data[1];
+    AvoidYawRate = AvoidRoll*0.5;
     //Obstacle_position = {msg->data[0], msg->data[1], msg->data[3], msg->data[4]}; // X, Y, to high, too low
 }
 
@@ -63,6 +64,7 @@ void DroneControl::RunDrone(){
                 TargetPosition = InputTargetPosition; // Input from controller
                 TargetPosition.velocity.x = TargetPosition.velocity.x + AvoidReverse; // Obstacle avoidance
                 TargetPosition.velocity.y = TargetPosition.velocity.y + AvoidRoll;      // Obstacle avoidance
+                TargetPosition.yaw_rate = TargetPosition.yaw_rate + AvoidYawRate;
 
                 if (InitiateLanding){
                     state = Landing;
@@ -96,6 +98,8 @@ void DroneControl::RunDrone(){
                 TargetPosition = InputTargetPosition;
                 TargetPosition.velocity.x = TargetPosition.velocity.x + AvoidReverse; // Obstacle avoidance
                 TargetPosition.velocity.y = TargetPosition.velocity.y + AvoidRoll;      // Obstacle avoidance
+                TargetPosition.yaw_rate = TargetPosition.yaw_rate + AvoidYawRate; //Obstacle avoidance
+
                 ROS_INFO_STREAM("Avoiding obstacle");
                 // Limit Movement
                 /*
