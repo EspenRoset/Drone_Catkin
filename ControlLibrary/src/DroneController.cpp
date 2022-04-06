@@ -17,7 +17,7 @@ void DroneControl::pose_cb(const nav_msgs::Odometry::ConstPtr& msg){
 }
 
 void DroneControl::collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg){
-    Obstacle_detected = static_cast<int>(msg->data[2]);
+    //Obstacle_detected = static_cast<int>(msg->data[2]);
     Roof_limit = static_cast<int>(msg->data[2]); 
     Floor_limit = static_cast<int>(msg->data[3]);
     AvoidReverse = msg->data[0];
@@ -94,6 +94,8 @@ void DroneControl::RunDrone(){
         case 5 /*Avoid Obstacle*/: // Limit movement to avoid crashing
                 // Get input from Controller
                 TargetPosition = InputTargetPosition;
+                TargetPosition.velocity.x = TargetPosition.velocity.x + AvoidReverse; // Obstacle avoidance
+                TargetPosition.velocity.y = TargetPosition.velocity.y + AvoidRoll;      // Obstacle avoidance
                 ROS_INFO_STREAM("Avoiding obstacle");
                 // Limit Movement
                 /*
@@ -108,7 +110,7 @@ void DroneControl::RunDrone(){
                     }
                 }
                 if (Floor_limit){ // Floor too close, limit z velocity to positive
-                    if (TargetPosition.velocity.z > 0){
+                    if (TargetPosition.velocity.z < 0){
                         TargetPosition.velocity.z = 0;
                     }
                 }

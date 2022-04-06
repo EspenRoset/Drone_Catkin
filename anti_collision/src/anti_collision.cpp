@@ -7,7 +7,7 @@ void analysis::FuzzyGetVelocities(float maxRoll, float maxPitch){
     float FuzzyPitch = analysis::Pitch->getValue();
     ROS_INFO("F2");
     //Scale Roll
-    data[1] = (maxRoll/0.5)*FuzzyRoll-maxRoll;
+    data[1] = -1*((maxRoll/0.5)*FuzzyRoll-maxRoll);
     ROS_INFO("Speed Roll-Pitch:");
     ROS_INFO_STREAM(data[1]);
     ROS_INFO("F3");
