@@ -35,7 +35,7 @@ class analysis
     float sensorUp;             
     float sensorDown;
 
-    fl::Engine* engine = fl::FllImporter().fromFile("/home/hgr/Drone_Catkin/src/anti_collision/src/ObstacleAvoidance.fll"); // Fuzzy engine
+    fl::Engine* engine = fl::FllImporter().fromFile("/home/ubuntu/catkin_ws_github/src/anti_collision/src/ObstacleAvoidance.fll"); // Fuzzy engine
 
     fl::InputVariable* ScreenLS = engine->getInputVariable("ScreenLS"); // Fuzzy inputs
     fl::InputVariable* ScreenLD = engine->getInputVariable("ScreenLD");
