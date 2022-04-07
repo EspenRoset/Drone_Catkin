@@ -386,7 +386,7 @@ namespace t265_depth
             if (pub_disparity_.getNumSubscribers() > 0)
             {
             //cv::normalize(left_disp, left_disp8u, 0, 255, cv::NORM_MINMAX, CV_8U);
-            cv::cvtColor(filtered_disp, filtered_disp8u, CV_8U);
+            cv::cvtColor(filtered_disp, filtered_disp8u, COLOR_BGR2GRAY);
             //cv::normalize(filtered_disp, filtered_disp8u, 0, 255, cv::NORM_MINMAX, CV_8U);
             //cv::ximgproc::getDisparityVis(filtered_disp, filtered_disp8u, 20.0);
             // publish disparity image
