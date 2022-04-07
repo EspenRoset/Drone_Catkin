@@ -334,6 +334,7 @@ namespace t265_depth
                     speckle_range_,
                     mode);
                 auto wls_filter = cv::ximgproc::createDisparityWLSFilter(left_matcher);
+                Ptr<StereoMatcher> right_matcher = createRightMatcher(left_matcher);
                 wls_filter->setLambda(8000.0);
                 wls_filter->setSigmaColor(1.5);
                 
@@ -342,6 +343,7 @@ namespace t265_depth
 
                 auto startTime = std::chrono::high_resolution_clock::now();
                 left_matcher->compute(undist_image_left_, undist_image_right_, left_disp);
+                right_matcher->compute(undist_image_right_,undist_image_left_, right_disp);
                 wls_filter->filter(left_disp, undist_image_left_, filtered_disp, right_disp);
                 auto endTime = std::chrono::high_resolution_clock::now();
                 auto compTime = (endTime-startTime);
@@ -361,8 +363,16 @@ namespace t265_depth
                 left_matcher->setUniquenessRatio(uniqueness_ratio_);
                 left_matcher->setSpeckleRange(speckle_range_);
                 left_matcher->setSpeckleWindowSize(speckle_window_size_);
+                auto wls_filter = cv::ximgproc::createDisparityWLSFilter(left_matcher);
+                wls_filter->setLambda(8000.0);
+                wls_filter->setSigmaColor(1.5);
+                Ptr<StereoMatcher> right_matcher = createRightMatcher(left_matcher);
+
                 auto startTime = std::chrono::high_resolution_clock::now();
                 left_matcher->compute(undist_image_left_, undist_image_right_, left_disp);
+                right_matcher->compute(undist_image_right_,undist_image_left_, right_disp);
+                wls_filter->filter(left_disp, undist_image_left_, filtered_disp, right_disp);
+
                 auto endTime = std::chrono::high_resolution_clock::now();
                 auto compTime = (endTime-startTime);
                 ROS_INFO("BM compute Time: ");
@@ -376,7 +386,14 @@ namespace t265_depth
             if (pub_disparity_.getNumSubscribers() > 0)
             {
             //cv::normalize(left_disp, left_disp8u, 0, 255, cv::NORM_MINMAX, CV_8U);
-            cv::normalize(filtered_disp, filtered_disp8u, 0, 255, cv::NORM_MINMAX, CV_8U);
+           // cv::cvtColor(filtered_disp, filtered_disp8u, COLOR_BGR2GRAY);
+            //filtered_disp.convertTo(filtered_disp8u, CV_8UC1);
+            filtered_disp = filtered_disp*0.4;
+            double minVal, maxVal;
+            cv::Point minLoc, maxLoc;
+            cv::minMaxLoc(filtered_disp, &minVal, &maxVal, &minLoc, &maxLoc);
+            cv::normalize(filtered_disp, filtered_disp8u, minVal, maxVal, cv::NORM_MINMAX, CV_8U);
+            //cv::ximgproc::getDisparityVis(filtered_disp, filtered_disp8u, 20.0);
             // publish disparity image
             sensor_msgs::ImagePtr out_disparity_msg;
             //out_disparity_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", left_disp8u).toImageMsg();
