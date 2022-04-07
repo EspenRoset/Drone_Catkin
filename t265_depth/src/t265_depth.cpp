@@ -388,7 +388,7 @@ namespace t265_depth
             //cv::normalize(left_disp, left_disp8u, 0, 255, cv::NORM_MINMAX, CV_8U);
            // cv::cvtColor(filtered_disp, filtered_disp8u, COLOR_BGR2GRAY);
             //filtered_disp.convertTo(filtered_disp8u, CV_8UC1);
-            filtered_disp = filtered_disp*0.5;
+            filtered_disp = filtered_disp*0.35;
             double minVal, maxVal;
             cv::Point minLoc, maxLoc;
             cv::minMaxLoc(filtered_disp, &minVal, &maxVal, &minLoc, &maxLoc);
