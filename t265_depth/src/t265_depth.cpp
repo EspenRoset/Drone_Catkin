@@ -387,7 +387,7 @@ namespace t265_depth
             {
             //cv::normalize(left_disp, left_disp8u, 0, 255, cv::NORM_MINMAX, CV_8U);
             //cv::normalize(filtered_disp, filtered_disp8u, 0, 255, cv::NORM_MINMAX, CV_8U);
-            cv::ximgproc::getDisparityVis(filtered_disp, filtered_disp8u, 1.0);
+            cv::ximgproc::getDisparityVis(filtered_disp, filtered_disp8u, 20.0);
             // publish disparity image
             sensor_msgs::ImagePtr out_disparity_msg;
             //out_disparity_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", left_disp8u).toImageMsg();
