@@ -22,7 +22,7 @@ void DroneControl::collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg
     Floor_limit = static_cast<int>(msg->data[3]);
     AvoidReverse = msg->data[0];
     AvoidRoll = msg->data[1];
-    AvoidYawRate = AvoidRoll*0.8;
+    AvoidYawRate = AvoidRoll*0.800;
     //Obstacle_position = {msg->data[0], msg->data[1], msg->data[3], msg->data[4]}; // X, Y, to high, too low
 }
 
