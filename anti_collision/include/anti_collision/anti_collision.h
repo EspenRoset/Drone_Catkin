@@ -17,7 +17,6 @@
 #include <vector>
 #include <math.h>
 
-
 void sayHello();
 
 class analysis
@@ -36,7 +35,7 @@ class analysis
     float sensorUp;             
     float sensorDown;
 
-    fl::Engine* engine = fl::FllImporter().fromFile("/home/ubuntu/catkin_ws_github/src/anti_collision/src/ObstacleAvoidance.fll"); // Fuzzy engine
+    fl::Engine* engine = fl::FllImporter().fromFile("/home/hgr/Drone_Catkin/src/anti_collision/src/ObstacleAvoidance.fll"); // Fuzzy engine
 
     fl::InputVariable* ScreenLS = engine->getInputVariable("ScreenLS"); // Fuzzy inputs
     fl::InputVariable* ScreenLD = engine->getInputVariable("ScreenLD");
@@ -71,7 +70,7 @@ class analysis
     float Vx = 0; //Speed in x direction, to slow down drone
     
     // Param ROLL // NOT IN USE!!
-    int disparitry_center = 200; // Relative origo disparity map
+    int disparitry_center = 200; // Relative origo disparity mapz|
     float k4 = 50; // Distance from origo considered safe
     float k5 = 0.005; // Gain roll - CAREFUL WITH THIS
 

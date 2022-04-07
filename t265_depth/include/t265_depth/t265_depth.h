@@ -15,6 +15,8 @@
 #include <opencv2/opencv.hpp>
 
 #include "opencv2/ximgproc.hpp"
+#include <opencv2/ximgproc/disparity_filter.hpp>
+
 #include <image_geometry/stereo_camera_model.h>
 
 #include <message_filters/subscriber.h>

@@ -254,6 +254,10 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             // Update message and publish
             detectedObject.data = data;
             pub.publish(detectedObject);
+            //cv::imshow("Left", depth_left);
+            //cv::imshow("Mid", depth_mid);
+            //cv::imshow("Right", depth_right);
+            //cv::waitKey(1);
 
 
         }
