@@ -77,6 +77,12 @@ int main(int argc, char** argv)
             Drone.InitiateLanding = true;
             ROS_INFO_STREAM("Sent landing command");
         }
+
+        if (Controller.Return){
+            Drone.InitiateReturn = true;
+            ROS_INFO_STREAM("Sent return command");
+            Drone.cv.notify_one();
+        }
 /*
         try{
           test.publish(testArray); //Can be used for testing avoidance system

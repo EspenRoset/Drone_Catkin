@@ -19,6 +19,7 @@
 #include <mutex>
 #include <chrono>
 #include <condition_variable>
+#include <math.h>
 
 class DroneControl{
     private:
@@ -29,6 +30,7 @@ class DroneControl{
         const int Landing = 3;
         const int Landed = 4;
         const int AvoidObstacle = 5;
+        const int ReturnHome = 6;
         
         std::chrono::time_point<std::chrono::steady_clock> EndTimeReverse; 
         std::chrono::time_point<std::chrono::steady_clock> EndTimeReset; 
@@ -38,7 +40,10 @@ class DroneControl{
         std::vector<float> Obstacle_position;
         float AvoidReverse = 0;
         float AvoidRoll = 0;
+        float AvoidYawRate = 0;
         float StartingHeight = 0.0;
+        std::vector<std::vector<double>> ReturnWaypoints = {};
+        double roll, pitch, yaw;
 
 
         ros::Subscriber state_sub;
@@ -71,12 +76,18 @@ class DroneControl{
         void PX4Arm();
         void DroneTakeoff(float altitude);
         void DroneLand();
+        void ResetWaypoints();
+        void AddWaypoint();
+        void ChangeToBodyFrame();
+        void ChangeToLocalFrame();
+        float CalcYawRate();
 
     public:
         float TakeoffAltitude = 1.0; // meter
         bool InitiateTakeoff = false;
         bool ArmDrone = false;
         bool InitiateLanding = false;
+        bool InitiateReturn = false;
 
         std::condition_variable cv;
         mavros_msgs::PositionTarget InputTargetPosition;
@@ -116,6 +127,7 @@ class DroneControl{
     void ReverseDrone(int reverseMilliSec);
     void check_height();
     void RunDrone();
+    bool check_position(std::vector<double> pos, double ErrorTolerance);
 };
 
 #endif
