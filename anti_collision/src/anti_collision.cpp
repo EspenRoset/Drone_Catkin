@@ -89,7 +89,8 @@ void analysis::Calibration(const sensor_msgs::ImageConstPtr& msg){
     cv::Point TopLeft(((c/2)-N/2), ((r/2)-N/2));
     cv::Point BtmRight(((c/2)+N/2), ((r/2)+N/2));
     cv::Rect rect(((int)((c/2)-N/2)), ((int)((r/2)-N/2))-10, N, N);
-    cv::rectangle(disparity, rect, cv::Scalar(0,255,0));
+    cv::Rect rect2(((int)((c/2)-N/2)-7), ((int)((r/2)-N/2)-15), N+15, N+15);
+    cv::rectangle(disparity, rect2, cv::Scalar(0,255,0));
     cv::Mat test = disparity(rect);
     double minVal; 
     double maxVal; 
@@ -100,14 +101,19 @@ void analysis::Calibration(const sensor_msgs::ImageConstPtr& msg){
     cv::imshow("disparity", disparity);
     cv::imshow("crop", test);
     cv::Scalar meanValue = cv::mean(test);
-    double distance = 6646.77f/meanValue[0];
-    distance +=  21.669;
-    ROS_INFO("-----");
-    ROS_INFO("Distance:");
-    ROS_INFO_STREAM(distance);
-    ROS_INFO("-----");
-    ROS_INFO("Max:");
+    ROS_INFO("CALIBRATION (mean, max, min):");
+
+    ROS_INFO_STREAM(meanValue[0]);
     ROS_INFO_STREAM(maxVal);
+    ROS_INFO_STREAM(minVal);
+    //double distance = 6646.77f/meanValue[0];
+    //distance +=  21.669;
+    //ROS_INFO("-----");
+    //ROS_INFO("Distance:");
+    //ROS_INFO_STREAM(distance);
+    //ROS_INFO("-----");
+    //ROS_INFO("Max:");
+    //ROS_INFO_STREAM(maxVal);
     cv::waitKey(1);
 }
 
@@ -193,43 +199,38 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
     try
     
         {
-            ROS_INFO("1");
             // Acquire and trim disparity map
             cv::Mat disparity = cv_bridge::toCvShare(msg, "mono8")->image;
             disparity.convertTo(disparity,CV_8UC1,1.0);
             int dR = disparity.rows;
             int dC = disparity.cols;
             disparity = disparity(cv::Range(0,dR),cv::Range(65, dC)); // Remove dead part of frame (37) and slice for equal FOV after
-            ROS_INFO("2");
-            cv::Mat depth_map = 6646.777f/disparity;
-            depth_map +=21.669;
+            cv::Mat depth_map = 13195.853f/disparity;
+            depth_map +=-31.805994;
+
             // Split into three equal separate depth maps Left(L), Mid(M), Right(R)
             int sliceIndex = depth_map.cols/3;
             cv::Mat depth_left = depth_map(cv::Range(0,dR),cv::Range(0, sliceIndex));
             cv::Mat depth_mid = depth_map(cv::Range(0,dR),cv::Range(sliceIndex, 2*sliceIndex));
             cv::Mat depth_right = depth_map(cv::Range(0,dR),cv::Range(2*sliceIndex, 3*sliceIndex));
-            ROS_INFO("3");
             cv::Mat mean, stddev, mask, maskL, maskM, maskR;
+
             // Mask to segment regions with depth less than safe distance
             cv::inRange(depth_left, 40, depth_thresh, maskL);
             cv::inRange(depth_mid, 40, depth_thresh, maskM);
             cv::inRange(depth_right, 40, depth_thresh, maskR);
-            ROS_INFO("4");
             double sL = (cv::sum(maskL)[0])/255.0;
             double sM = (cv::sum(maskM)[0])/255.0;
             double sR = (cv::sum(maskR)[0])/255.0;
-            ROS_INFO("5");
             double img_areaL = double(maskL.rows * maskL.cols);
             double img_areaM = double(maskM.rows * maskM.cols);
             double img_areaR = double(maskR.rows * maskR.cols);
-            ROS_INFO("6");
             ScreenLS->setValue(sL/img_areaL);
             ScreenMS->setValue(sM/img_areaM);
             ScreenRS->setValue(sR/img_areaR);
-            ROS_INFO("7");
             std::vector<std::vector<cv::Point>> contours;
             std::vector<cv::Vec4i> hierarchy;
-            ROS_INFO("8");
+
             // Find contours for Left
             cv::findContours(maskL, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
             // New blank mask with same size
@@ -240,7 +241,6 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::meanStdDev(depth_left, mean, stddev, mask);
             // Set parameter on fuzzy regulator
             ScreenLD->setValue(mean.at<double>(0,0)/60 - 0.66667); // Normalize
-            ROS_INFO("8");
             // Repeat above step for M and R
 
             // M
@@ -249,18 +249,15 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::drawContours(mask, contours, 0, (255), -1);
             cv::meanStdDev(depth_mid, mean, stddev, mask);
             ScreenMD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize [0-1]
-            ROS_INFO("9"); // RR
             cv::findContours(maskR, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
             mask = maskL*0;
             cv::drawContours(mask, contours, 0, (255), -1);
             cv::meanStdDev(depth_right, mean, stddev, mask);
             ScreenRD->setValue(mean.at<double>(0,0)/60 - 0.66667);// Normalize [0-1]
-            ROS_INFO("10");
 
             // Compute
             analysis::FuzzyGetVelocities(maxRoll, maxPitch);
             verticalCheck(data);
-            ROS_INFO("11");
             
             // Update message and publish
             detectedObject.data = data;
@@ -269,7 +266,6 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             //cv::imshow("Mid", depth_mid);
             //cv::imshow("Right", depth_right);
             //cv::waitKey(1);
-            ROS_INFO("12");
 
 
         }

@@ -77,6 +77,7 @@ class analysis
     analysis(ros::NodeHandle& nh){
         image_transport::ImageTransport it(nh);
         sub = it.subscribe("/disparity",1 , &analysis::detectobject, this);
+        //sub = it.subscribe("/disparity",1 , &analysis::Calibration, this); // FOR CALIBARTION, should be commented out unless calibrating
         //subClean = it.subscribe("/camera/fisheye1/image_raw/rectified",1 , &analysis::updateFrame1, this);
         subSensorDown = nh.subscribe("/distance_down", 1, &analysis::sensordown_update, this);
         subSensorUp = nh.subscribe("/distance_up", 1, &analysis::sensorup_update, this);
