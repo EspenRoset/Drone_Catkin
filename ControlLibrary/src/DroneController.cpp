@@ -310,3 +310,11 @@ void DroneControl::ChangeToLocalFrame(){ // Change to Local(world) frame when se
     TargetPosition.velocity.y = 0;
     TargetPosition.velocity.z = 0;
 }
+
+void DroneControl::YawDegrees(double degrees){
+    TargetPosition.type_mask = 2048; // Ignoring yaw rate, using yaw angle
+    ChangeToLocalFrame(); // Change to world frame
+    double TargetYaw = DroneControl::yaw + (degrees*3.14159265359/180.0);
+    TargetPosition.yaw = TargetYaw;
+    ChangeToBodyFrame();
+}

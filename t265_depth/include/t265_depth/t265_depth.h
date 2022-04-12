@@ -129,6 +129,7 @@ namespace t265_depth
         int disp_12_max_diff_;
 
         bool do_median_blur_;
+        bool do_rectify;
         // output stereo
         float stereo_cx;
         float stereo_cy;
