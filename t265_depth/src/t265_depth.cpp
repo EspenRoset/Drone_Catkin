@@ -175,6 +175,12 @@ namespace t265_depth
         param_file["R"] >> R;
         param_file["T"] >> T;
 
+        if(K2(0,0) == K1(0,0)){ // Used to stop rectification in simulation
+            do_rectify = false;
+        } else{
+            do_rectify = true;
+        }
+
         param_file["input"] >> size_input;
         param_file["output"] >> size_output;
 
@@ -299,8 +305,14 @@ namespace t265_depth
         if (image_left_.rows > 0 && image_right_.rows > 0)
         {
             auto startTime = std::chrono::high_resolution_clock::now();
+            if(do_rectify){
             cv::remap(image_left_, undist_image_left_, lmapx_, lmapy_, cv::INTER_LINEAR);
             cv::remap(image_right_, undist_image_right_, rmapx_, rmapy_, cv::INTER_LINEAR);
+            } else{
+                undist_image_left_ = image_left_;
+                undist_image_right_ = image_right_;
+            }
+            
             auto endTime = std::chrono::high_resolution_clock::now();
             auto compTime = (endTime-startTime);
             ROS_INFO("Remap Time: ");
