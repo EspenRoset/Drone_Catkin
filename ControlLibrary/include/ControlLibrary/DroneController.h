@@ -122,6 +122,7 @@ class DroneControl{
     }
 
     void state_cb(const mavros_msgs::State::ConstPtr& msg);
+    void YawDegrees(double degrees);
     void pose_cb(const nav_msgs::Odometry::ConstPtr& msg);
     void collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg);
     void ReverseDrone(int reverseMilliSec);
