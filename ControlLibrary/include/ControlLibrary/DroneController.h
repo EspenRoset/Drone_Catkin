@@ -23,6 +23,7 @@
 
 class DroneControl{
     private:
+    //States
         int state;
         const int Startup = 0;
         const int Takeoff = 1;
@@ -31,6 +32,7 @@ class DroneControl{
         const int Landed = 4;
         const int AvoidObstacle = 5;
         const int ReturnHome = 6;
+        const int ReturnHomeAvoidance = 7;
         
         std::chrono::time_point<std::chrono::steady_clock> EndTimeReverse; 
         std::chrono::time_point<std::chrono::steady_clock> EndTimeReset; 

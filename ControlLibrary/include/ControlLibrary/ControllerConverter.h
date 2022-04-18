@@ -30,6 +30,7 @@ class ControllerConverter{
     int armingBtn = 0;
     int takeoffBtn = 0;
     int returnBtn = 0;
+    int turnBtn = 0;
     std::thread UpdateThread;
 
 
@@ -38,6 +39,7 @@ class ControllerConverter{
     bool Takeoff = false;
     bool Arm = false;
     bool Return = false;
+    bool Turn = false;
     mavros_msgs::PositionTarget Target; 
 
     ControllerConverter(ros::NodeHandle& n, ros::Rate& rate){
@@ -49,7 +51,7 @@ class ControllerConverter{
         Target.type_mask = 1024;
     }
     std::vector<float> Scaling = {0.5, 1, 0.5, 2}; 
-    // Pitch, Yaw, Throttle
+    // Pitch, Yaw, Throttle, Multiplier
 
     void ControlUpdate(const sensor_msgs::JoyConstPtr& msg);
     void pose_cb(const nav_msgs::Odometry::ConstPtr& msg);

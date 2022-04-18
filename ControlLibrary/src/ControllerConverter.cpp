@@ -15,6 +15,8 @@ void ControllerConverter::ControlUpdate(const sensor_msgs::JoyConstPtr& msg){
  ControllerConverter::landBtn = msg->buttons[1];
  ControllerConverter::armingBtn = msg->buttons[5];
  ControllerConverter::returnBtn = msg->buttons[2];
+ ControllerConverter::turnBtn = msg->axes[7];
+ 
  if (armingBtn){
      Arm = true;
  } else{
@@ -34,6 +36,11 @@ void ControllerConverter::ControlUpdate(const sensor_msgs::JoyConstPtr& msg){
      Return = true;
  } else{
      Return = false;
+ }
+ if (turnBtn < 0){
+     Turn = true;
+ } else{
+     Turn = false;
  }
 }
 

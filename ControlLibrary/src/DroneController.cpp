@@ -50,9 +50,7 @@ void DroneControl::RunDrone(){
 
                 StartingHeight = current_position.pose.pose.position.z; //Reference height used for calcing takeoff height
                 ROS_INFO_STREAM("Waiting for Takeoff command (Rb + A)");
-                state = Takeoff;
-
-
+                state = Takeoff;   
             break;
         case 1 /*TakeOff*/: // Check OFFBOARD and arm, Take off to flight altitude
                 if (InitiateTakeoff /*&& !Roof_limit*/){
@@ -150,6 +148,14 @@ void DroneControl::RunDrone(){
                 state = Flying;
             }
 
+            break;
+        case 7 /*ReturnHomeAvoidance*/: //Avoid obstacles on the way home
+            // 1 - Stop drone
+            // 2 - Yaw to check safety in opposite direction of obstacle
+            // 3 - If safe then set a new waypoiny away from obstacle
+            // 3.1 - Go to new waypoint
+            // 4 - If not safe then 
+            // 5 - Resume RTH 
             break;
         default: // Maybe do something
             break;
