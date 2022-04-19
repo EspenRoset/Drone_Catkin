@@ -31,11 +31,11 @@ class analysis
     image_transport::Publisher pubGrid;
 
     std_msgs::Float32MultiArray detectedObject;
-    std::vector<float> data{0,0,0,0}; // {vx,vy,fu,fd} vx = pitch, vy = roll, fu = flag up (too close roof), fd = flag down (too close ground)
+    std::vector<float> data{0,0,0,0,0}; // {vx,vy,fu,fd, yaws} vx = pitch, vy = roll, fu = flag up (too close roof), fd = flag down (too close ground)
     float sensorUp;             
     float sensorDown;
 
-    fl::Engine* engine = fl::FllImporter().fromFile("/home/ubuntu/catkin_ws_github/src/anti_collision/src/ObstacleAvoidance.fll"); // Fuzzy engine
+    fl::Engine* engine = fl::FllImporter().fromFile("/home/hgr/Drone_Catkin/src/anti_collision/src/ObstacleAvoidance4.fll"); // Fuzzy engine
 
     fl::InputVariable* ScreenLS = engine->getInputVariable("ScreenLS"); // Fuzzy inputs
     fl::InputVariable* ScreenLD = engine->getInputVariable("ScreenLD");
@@ -46,6 +46,7 @@ class analysis
 
     fl::OutputVariable* Roll = engine->getOutputVariable("Roll"); // Fuzzy outputs 
     fl::OutputVariable* Pitch = engine->getOutputVariable("Pitch");
+    fl::OutputVariable* Yaw = engine->getOutputVariable("Yaw");
 
     
 
@@ -56,11 +57,15 @@ class analysis
     // Param Safety
     float minDistRoof = 1500; // Minimum distance above drone  (mm)
     float minAltitude = 500;  // Minimum distance bellow drone (mm)
-    float depth_thresh = 105;  // Threshold for SAFE distance (cm)
+    float depth_thresh = 160;  // Threshold for SAFE distance (cm)
+    float depth_min = 10; // Threshold for closest distance estimated (cm)
+    float normA = 1/(depth_thresh-depth_min);
+    float normB = -depth_min/depth_thresh;
 
     // Param Fuzzy
     float maxRoll = 1;
     float maxPitch = 1;
+    float maxYaw = 1;
 
 
     // Param REVERSE // NOT IN USE!!
@@ -96,7 +101,7 @@ class analysis
     float CalcVx(double avgDistance); // NOT
     float CalcVy(cv::Rect b, float Vx); //NOT
     void FuzzyGetVelocities(float maxRoll, float maxPitch); // IN USE
-    
+    void displaySystemReaction(cv::Mat dsp, std::vector<float> data);
 };
 
 
