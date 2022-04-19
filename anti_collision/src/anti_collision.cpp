@@ -100,8 +100,8 @@ void analysis::Calibration(const sensor_msgs::ImageConstPtr& msg){
     cv::Point maxLoc;
 
     minMaxLoc(test, &minVal, &maxVal, &minLoc, &maxLoc ); 
-    cv::imshow("disparity", disparity);
-    cv::imshow("crop", test);
+    //cv::imshow("disparity", disparity);
+    //cv::imshow("crop", test);
     cv::Scalar meanValue = cv::mean(test);
     ROS_INFO("CALIBRATION (mean, max, min):");
 
@@ -216,7 +216,7 @@ void analysis::displaySystemReaction(cv::Mat dsp, std::vector<float> data)
     cv::arrowedLine(dsp, center, center+Proll, CV_RGB(255,0,0),thickness, lineType, 0, tipLength);
     cv::arrowedLine(dsp, center, center+Ppitch, CV_RGB(255,3.1415/2,0),thickness, lineType, 0, tipLength);
     cv::arrowedLine(dsp, center+cv::Point(0,-20), center+Pyaw+cv::Point(0,-20), CV_RGB(255,3.1415/2,0),thickness, lineType, 0, tipLength);
-    cv::imshow("ARROW", dsp);
+    //cv::imshow("ARROW", dsp);
     cv::waitKey(1);
 }
 
@@ -264,7 +264,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             mask = maskL*0;
             // Draw the contour on the blank mask2
             cv::drawContours(mask, contours, 0, (255), -1);
-            cv::imshow("LeftC", mask);
+            //cv::imshow("LeftC", mask);
             // Calculating the average depth of the masked area
             cv::meanStdDev(depth_left, mean, stddev, mask);
             ROS_INFO_STREAM(mean.at<double>(0,0));
@@ -276,14 +276,14 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::findContours(maskM, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
             mask = maskM*0;
             cv::drawContours(mask, contours, 0, (255), -1);
-            cv::imshow("MidC", mask);
+            //cv::imshow("MidC", mask);
             cv::meanStdDev(depth_mid, mean, stddev, mask);
             ROS_INFO_STREAM(mean.at<double>(0,0));
             ScreenMD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
             cv::findContours(maskR, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
             mask = maskL*0;
             cv::drawContours(mask, contours, 0, (255), -1);
-            cv::imshow("RightC", mask);
+            //cv::imshow("RightC", mask);
             cv::meanStdDev(depth_right, mean, stddev, mask);
             ROS_INFO_STREAM(mean.at<double>(0,0));
             ScreenRD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
@@ -295,13 +295,13 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             // Update message and publish
             detectedObject.data = data;
             pub.publish(detectedObject);
-            cv::imshow("Left", depth_left);
-            cv::imshow("Mid", depth_mid);
-            cv::imshow("Right", depth_right);
+            //cv::imshow("Left", depth_left);
+            //cv::imshow("Mid", depth_mid);
+            //cv::imshow("Right", depth_right);
             analysis::displaySystemReaction(disparity, data);
             
             
-            cv::waitKey(1);
+            //cv::waitKey(1);
 
 
         }
