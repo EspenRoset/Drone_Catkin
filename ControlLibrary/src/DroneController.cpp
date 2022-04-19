@@ -21,8 +21,8 @@ void DroneControl::collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg
     Roof_limit = static_cast<int>(msg->data[2]); 
     Floor_limit = static_cast<int>(msg->data[3]);
     AvoidReverse = msg->data[0];
-    AvoidRoll = msg->data[1];
-    AvoidYawRate = AvoidRoll*0.800;
+    AvoidRoll = msg->data[1]; // Negativ = Høgre, Positiv = Venstre 
+    AvoidYawRate = msg->data[4]; // Positiv = med klokka, negativ = mot klokka 
     //Obstacle_position = {msg->data[0], msg->data[1], msg->data[3], msg->data[4]}; // X, Y, to high, too low
 }
 
@@ -40,7 +40,7 @@ void DroneControl::RunDrone(){
                 }
 
                 ROS_INFO_STREAM("Drone starting up");
-                DroneControl::SendNWaipoints(100); // Send somewaypoints to prepare for mode change
+                DroneControl::SendNWaipoints(100); // Send some waypoints to prepare for mode change
                 if (current_state.mode != "OFFBOARD"){
                     DroneControl::SetPX4Mode("OFFBOARD"); // Change mode to offboard
                 }
@@ -127,6 +127,7 @@ void DroneControl::RunDrone(){
         case 6 /*ReturnHome*/: //Follow waypoints back home
             ChangeToLocalFrame();
             CalcYawRate(); // Keep drone pointing towards next point
+
             while (check_position(ReturnWaypoints.back(), 0.5 && ReturnWaypoints.size() > 1)){
                 ROS_INFO_STREAM("Going to the next waypoint");
                 ReturnWaypoints.pop_back();
@@ -291,6 +292,7 @@ float DroneControl::CalcYawRate(){
     float x2 = ReturnWaypoints.back()[0] - current_position.pose.pose.position.x; // Move objective point
     float y2 = ReturnWaypoints.back()[1] - current_position.pose.pose.position.y;
    
+    
 
     float x1 = 1; //Reference Point
     float y1 = 0; 
@@ -323,4 +325,22 @@ void DroneControl::YawDegrees(double degrees){
     double TargetYaw = DroneControl::yaw + (degrees*3.14159265359/180.0);
     TargetPosition.yaw = TargetYaw;
     ChangeToBodyFrame();
+}
+
+void DroneControl::AdjustWaypoints(){
+    float x2 = ReturnWaypoints.back()[0] - current_position.pose.pose.position.x; // Move objective point
+    float y2 = ReturnWaypoints.back()[1] - current_position.pose.pose.position.y;
+
+    
+    float AvoidScale = 0.5;
+
+    if (AvoidRoll > 0){
+        ReturnWaypoints.back()[0] -= (y2*AvoidScale*AvoidRoll);
+        ReturnWaypoints.back()[1] += (x2*AvoidScale*AvoidRoll);
+    }
+    if (AvoidRoll < 0){
+        ReturnWaypoints.back()[0] += (y2*AvoidScale*AvoidRoll);
+        ReturnWaypoints.back()[1] -= (x2*AvoidScale*AvoidRoll);
+    }
+
 }

@@ -129,6 +129,7 @@ class DroneControl{
     void collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg);
     void ReverseDrone(int reverseMilliSec);
     void check_height();
+    void AdjustWaypoints();
     void RunDrone();
     bool check_position(std::vector<double> pos, double ErrorTolerance);
 };
