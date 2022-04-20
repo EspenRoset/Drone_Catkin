@@ -267,9 +267,11 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             //cv::imshow("LeftC", mask);
             // Calculating the average depth of the masked area
             cv::meanStdDev(depth_left, mean, stddev, mask);
-            ROS_INFO_STREAM(mean.at<double>(0,0));
+            //ROS_INFO_STREAM(mean.at<double>(0,0));
             // Set parameter on fuzzy regulator
             ScreenLD->setValue(mean.at<double>(0,0)*normA + normB); // Normalize
+            ROS_INFO_STREAM("Normalized distances, L, M, R: ");
+            ROS_INFO_STREAM(ScreenLD->getValue());
             // Repeat above step for M and R
 
             // M
@@ -278,16 +280,17 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::drawContours(mask, contours, 0, (255), -1);
             //cv::imshow("MidC", mask);
             cv::meanStdDev(depth_mid, mean, stddev, mask);
-            ROS_INFO_STREAM(mean.at<double>(0,0));
+            //ROS_INFO_STREAM(mean.at<double>(0,0));
             ScreenMD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
+            ROS_INFO_STREAM(ScreenMD->getValue());
             cv::findContours(maskR, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
             mask = maskL*0;
             cv::drawContours(mask, contours, 0, (255), -1);
             //cv::imshow("RightC", mask);
             cv::meanStdDev(depth_right, mean, stddev, mask);
-            ROS_INFO_STREAM(mean.at<double>(0,0));
+            //ROS_INFO_STREAM(mean.at<double>(0,0));
             ScreenRD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
-
+            ROS_INFO_STREAM(ScreenRD->getValue());
             // Compute
             analysis::FuzzyGetVelocities(maxRoll, maxPitch);
             verticalCheck(data);
