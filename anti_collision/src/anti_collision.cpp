@@ -283,7 +283,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::meanStdDev(depth_mid, mean, stddev, mask);
             //ROS_INFO_STREAM(mean.at<double>(0,0));
             ScreenMD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
-            mean.at<double>(0,0);
+            ROS_INFO_STREAM(mean.at<double>(0,0));
             ROS_INFO_STREAM(ScreenMD->getValue());
             cv::findContours(maskR, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
             mask = maskL*0;
@@ -292,7 +292,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::meanStdDev(depth_right, mean, stddev, mask);
             //ROS_INFO_STREAM(mean.at<double>(0,0));
             ScreenRD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
-            mean.at<double>(0,0);
+            ROS_INFO_STREAM(mean.at<double>(0,0));
             ROS_INFO_STREAM(ScreenRD->getValue());
             // Compute
             analysis::FuzzyGetVelocities(maxRoll, maxPitch);
