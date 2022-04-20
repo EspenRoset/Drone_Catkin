@@ -296,14 +296,14 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             //cv::imshow("Right", depth_right);
             analysis::displaySystemReaction(disparity, data);
             
-            cv::imshow("L", depth_left);
-            cv::imshow("M", depth_mid);
-            cv::imshow("R", depth_right);
-            cv::imshow("LC", maskL);
-            cv::imshow("MC", maskM);
-            cv::imshow("RC", maskR);
+            //cv::imshow("L", depth_left);
+            //cv::imshow("M", depth_mid);
+            //cv::imshow("R", depth_right);
+            //cv::imshow("LC", maskL);
+            //cv::imshow("MC", maskM);
+            //cv::imshow("RC", maskR);
             
-            cv::waitKey(1);
+            //cv::waitKey(1);
 
 
         }

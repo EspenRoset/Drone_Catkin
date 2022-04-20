@@ -101,12 +101,6 @@ RuleBlock: mamdani
  rule: if ScreenMD is medium then Pitch is reverse
  rule: if ScreenMD is close then Pitch is hardReverse
 
- rule: if ScreenLD is close then Pitch is reverse
- rule: if ScreenRD is close then Pitch is reverse
-
-
- rule: if ScreenLD is medium and ScreenMD is far and ScreenRD is medium then Pitch is stay
- rule: if ScreenLD is close and ScreenMD is far and ScreenRD is close then Pitch is stay
 
  rule: if ScreenLD is far then Roll is stay
  rule: if ScreenLD is medium then Roll is right
