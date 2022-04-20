@@ -3,7 +3,7 @@
 // Githubtest
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "test_node");
+  ros::init(argc, argv, "anti_collision_node");
   ros::NodeHandle nh;
   ros::Rate rate(20.0);
   analysis test(nh);

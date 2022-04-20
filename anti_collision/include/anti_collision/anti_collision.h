@@ -86,7 +86,7 @@ class analysis
         //subClean = it.subscribe("/camera/fisheye1/image_raw/rectified",1 , &analysis::updateFrame1, this);
         subSensorDown = nh.subscribe("/distance_down", 1, &analysis::sensordown_update, this);
         subSensorUp = nh.subscribe("/distance_up", 1, &analysis::sensorup_update, this);
-        pub = nh.advertise<std_msgs::Float32MultiArray>("object_detection", 1); 
+        pub = nh.advertise<std_msgs::Float32MultiArray>("course_correction", 1); 
         //pubGrid = it.advertise("/disparity/gridview",1, &analysis::gridview, this); 
 
     }

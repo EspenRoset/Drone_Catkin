@@ -127,7 +127,7 @@ void DroneControl::RunDrone(){
         case 6 /*ReturnHome*/: //Follow waypoints back home
             ChangeToLocalFrame();
             CalcYawRate(); // Keep drone pointing towards next point
-
+            // AdjustWaypoints();
             while (check_position(ReturnWaypoints.back(), 0.5 && ReturnWaypoints.size() > 1)){
                 ROS_INFO_STREAM("Going to the next waypoint");
                 ReturnWaypoints.pop_back();
