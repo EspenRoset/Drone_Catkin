@@ -25,7 +25,7 @@ void analysis::FuzzyGetVelocities(float maxRoll, float maxPitch){
         
     }
     //Scale Yaw
-    data[4] = 1*((maxYaw/0.5)*FuzzyYaw-maxYaw);
+    data[4] = -1*((maxYaw/0.5)*FuzzyYaw-maxYaw);
     ROS_INFO_STREAM(data[0]);
     ROS_INFO_STREAM(data[4]);
 
