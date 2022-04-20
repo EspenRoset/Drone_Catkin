@@ -60,7 +60,7 @@ class analysis
     float depth_thresh = 160;  // Threshold for SAFE distance (cm)
     float depth_min = 40; // Threshold for closest distance estimated (cm)
     float normA = 1/(depth_thresh-depth_min);
-    float normB = -depth_min/depth_thresh;
+    float normB = -depth_min/(depth_thresh-depth_min);
 
     // Param Fuzzy
     float maxRoll = 1;
