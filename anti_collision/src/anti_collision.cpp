@@ -243,9 +243,9 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::Mat mean, stddev, mask, maskL, maskM, maskR;
 
             // Mask to segment regions with depth less than safe distance
-            cv::inRange(depth_left, 10, depth_thresh, maskL);
-            cv::inRange(depth_mid, 10, depth_thresh, maskM);
-            cv::inRange(depth_right, 10, depth_thresh, maskR);
+            cv::inRange(depth_left, depth_min, depth_thresh, maskL);
+            cv::inRange(depth_mid, depth_min, depth_thresh, maskM);
+            cv::inRange(depth_right, depth_min, depth_thresh, maskR);
             double sL = (cv::sum(maskL)[0])/255.0;
             double sM = (cv::sum(maskM)[0])/255.0;
             double sR = (cv::sum(maskR)[0])/255.0;
