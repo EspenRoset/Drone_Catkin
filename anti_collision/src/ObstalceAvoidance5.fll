@@ -1,0 +1,142 @@
+#File: ObstacleAvoidance4.fll
+Engine: ObstacleAvoidance
+InputVariable: ScreenLS
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  term: nothing Trapezoid 0.000 0.000 0.100 0.250
+  term: small Triangle 0.100 0.200 0.300
+  term: medium Trapezoid 0.200 0.300 0.600 0.750
+  term: large Trapezoid 0.500 0.800 1.000 1.000
+InputVariable: ScreenLD
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  term: close Trapezoid 0.000 0.000 0.150 0.350
+  term: medium Trapezoid 0.220 0.300 0.400 0.500
+  term: far Trapezoid 0.400 0.550 1.000 1.000
+
+InputVariable: ScreenMS
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  term: nothing Trapezoid 0.000 0.000 0.100 0.200
+  term: small Triangle 0.100 0.200 0.300
+  term: medium Trapezoid 0.200 0.300 0.600 0.750
+  term: large Trapezoid 0.500 0.800 1.000 1.000
+InputVariable: ScreenMD
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  term: close Trapezoid 0.000 0.000 0.150 0.350
+  term: medium Trapezoid 0.220 0.300 0.400 0.500
+  term: far Trapezoid 0.400 0.550 1.000 1.000
+
+InputVariable: ScreenRS
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  term: nothing Trapezoid 0.000 0.000 0.100 0.200
+  term: small Triangle 0.100 0.200 0.300
+  term: medium Trapezoid 0.200 0.300 0.600 0.750
+  term: large Trapezoid 0.500 0.800 1.000 1.000
+
+InputVariable: ScreenRD
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  term: close Trapezoid 0.000 0.000 0.150 0.350
+  term: medium Trapezoid 0.220 0.300 0.400 0.500
+  term: far Trapezoid 0.400 0.550 1.000 1.000
+
+
+OutputVariable: Roll
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  aggregation: Maximum
+  defuzzifier: Centroid 100
+  default: 0.5
+  lock-previous: false
+  term: hardLeft Trapezoid 0.000 0.000 0.150 0.300
+  term: left Triangle 0.200 0.350 0.500
+  term: stay Trapezoid 0.300 0.450 0.550 0.700
+  term: right Triangle 0.500 0.650 0.800
+  term: hardRight Trapezoid 0.700 0.850 1.000 1.000
+
+OutputVariable: Yaw
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  aggregation: Maximum
+  defuzzifier: Centroid 100
+  default: 0.500
+  lock-previous: false
+  term: hardLeft Trapezoid 0.000 0.000 0.150 0.300
+  term: left Triangle 0.200 0.350 0.500
+  term: stay Trapezoid 0.400 0.450 0.550 0.600
+  term: right Triangle 0.500 0.650 0.800
+  term: hardRight Trapezoid 0.700 0.850 1.000 1.000
+
+OutputVariable: Pitch
+  enabled: true
+  range: 0.000 1.000
+  lock-range: false
+  aggregation: Maximum
+  defuzzifier: Centroid 100
+  default: 0
+  lock-previous: false
+  term: stay Trapezoid 0.000 0.000 0.150 0.300
+  term: reverse Triangle 0.250 0.500 0.750
+  term: hardReverse Trapezoid 0.700 0.900 1.000 1.000
+
+RuleBlock: mamdani
+  enabled: true
+  conjunction: AlgebraicProduct
+  disjunction: none
+  implication: AlgebraicProduct
+  activation: General
+
+ rule: if ScreenMD is far then Pitch is stay
+ rule: if ScreenMD is medium then Pitch is reverse
+ rule: if ScreenMD is close then Pitch is hardReverse
+
+ rule: if ScreenLD is close then Pitch is reverse
+ rule: if ScreenRD is close then Pitch is reverse
+
+
+ rule: if ScreenLD is medium and ScreenMD is far and ScreenRD is medium then Pitch is stay
+ rule: if ScreenLD is close and ScreenMD is far and ScreenRD is close then Pitch is stay
+
+ rule: if ScreenLD is far then Roll is stay
+ rule: if ScreenLD is medium then Roll is right
+ rule: if ScreenLD is close then Roll is hardRight
+
+ rule: if ScreenRD is far then Roll is stay
+ rule: if ScreenRD is medium then Roll is left
+ rule: if ScreenRD is close then Roll is hardLeft
+
+ rule: if ScreenLD is medium and ScreenMD is medium and ScreenRD is far then Roll is right
+ rule: if ScreenLD is far and ScreenMD is medium and ScreenRD is medium then Roll is left
+
+ rule: if ScreenLD is close and ScreenMD is close and ScreenRD is far then Roll is hardRight
+ rule: if ScreenLD is far and ScreenMD is close and ScreenRD is close then Roll is hardLeft 
+
+ #rule: if ScreenLS is large and ScreenLD is medium then Roll is right
+ #rule: if ScreenLS is medium and ScreenLD is medium then Roll is right
+ #rule: if ScreenLS is large and ScreenLD is close then Roll is hardRight
+ #rule: if ScreenLS is medium and ScreenLD is close then Roll is hardRight
+
+ #rule: if ScreenRS is large and ScreenRD is medium then Roll is left
+ #rule: if ScreenRS is medium and ScreenRD is medium then Roll is left
+ #rule: if ScreenRS is large and ScreenRD is close then Roll is hardLeft
+ #rule: if ScreenRS is medium and ScreenRD is close then Roll is hardLeft
+
+ rule: if ScreenLS is large then Yaw is right
+ rule: if ScreenRS is large then Yaw is left
+ 
+ rule: if ScreenLS is large and ScreenMS is large then Yaw is hardRight
+ rule: if ScreenRS is large and ScreenMS is large then Yaw is hardLeft
+
+ rule: if ScreenLS is large and ScreenMS is medium then Yaw is right
+ rule: if ScreenRS is large and ScreenMS is medium then Yaw is left
