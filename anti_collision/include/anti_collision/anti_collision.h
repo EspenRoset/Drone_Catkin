@@ -58,9 +58,10 @@ class analysis
     float minDistRoof = 1500; // Minimum distance above drone  (mm)
     float minAltitude = 500;  // Minimum distance bellow drone (mm)
     float depth_thresh = 160;  // Threshold for SAFE distance (cm)
-    float depth_min = 40; // Threshold for closest distance estimated (cm)
+    float depth_min = 30; // Threshold for closest distance estimated (cm)
     float normA = 1/(depth_thresh-depth_min);
     float normB = -depth_min/(depth_thresh-depth_min);
+    int hCut = 50; // Amount of rows to remove from bottom of depth map
 
     // Param Fuzzy
     float maxRoll = 1;

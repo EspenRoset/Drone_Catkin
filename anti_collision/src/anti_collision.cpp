@@ -237,9 +237,11 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
 
             // Split into three equal separate depth maps Left(L), Mid(M), Right(R)
             int sliceIndex = depth_map.cols/3;
-            cv::Mat depth_left = depth_map(cv::Range(0,dR),cv::Range(0, sliceIndex));
-            cv::Mat depth_mid = depth_map(cv::Range(0,dR),cv::Range(sliceIndex, 2*sliceIndex));
-            cv::Mat depth_right = depth_map(cv::Range(0,dR),cv::Range(2*sliceIndex, 3*sliceIndex));
+
+            int midOffset = 10;
+            cv::Mat depth_left = depth_map(cv::Range(50,dR-150),cv::Range(0, sliceIndex-midOffset));
+            cv::Mat depth_mid = depth_map(cv::Range(50,dR-150),cv::Range(sliceIndex-midOffset, 2*sliceIndex+midOffset));
+            cv::Mat depth_right = depth_map(cv::Range(50,dR-150),cv::Range(2*sliceIndex+midOffset, 3*sliceIndex));
             cv::Mat mean, stddev, mask, maskL, maskM, maskR;
 
             // Mask to segment regions with depth less than safe distance
@@ -259,6 +261,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             std::vector<cv::Vec4i> hierarchy;
             double min, max;
             cv::Point loc1, loc2;
+
             cv::minMaxLoc(depth_left, &min, &max, &loc1, &loc2, maskL);
             // Set parameter on fuzzy regulator
             if (min==0) {min = depth_thresh;}
@@ -293,8 +296,14 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             //cv::imshow("Right", depth_right);
             analysis::displaySystemReaction(disparity, data);
             
+            cv::imshow("L", depth_left);
+            cv::imshow("M", depth_mid);
+            cv::imshow("R", depth_right);
+            cv::imshow("LC", maskL);
+            cv::imshow("MC", maskM);
+            cv::imshow("RC", maskR);
             
-            //cv::waitKey(1);
+            cv::waitKey(1);
 
 
         }
