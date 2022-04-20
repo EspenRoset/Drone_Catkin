@@ -257,41 +257,25 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             ScreenRS->setValue(sR/img_areaR);
             std::vector<std::vector<cv::Point>> contours;
             std::vector<cv::Vec4i> hierarchy;
-
-            // Find contours for Left
-            cv::findContours(maskL, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-            // New blank mask with same size
-            mask = maskL*0;
-            // Draw the contour on the blank mask2
-            cv::drawContours(mask, contours, 0, (255), -1);
-            //cv::imshow("LeftC", mask);
-            // Calculating the average depth of the masked area
-            cv::meanStdDev(depth_left, mean, stddev, mask);
-            //ROS_INFO_STREAM(mean.at<double>(0,0));
+            double min, max;
+            cv::Point loc1, loc2;
+            cv::minMaxLoc(depth_left, &min, &max, &loc1, &loc2, maskL);
             // Set parameter on fuzzy regulator
-            ScreenLD->setValue(mean.at<double>(0,0)*normA + normB); // Normalize
+            ScreenLD->setValue(min*normA + normB); // Normalize
             ROS_INFO_STREAM("Unnormalized and normalized distances, L, M, R: ");
             ROS_INFO_STREAM(mean.at<double>(0,0));
             ROS_INFO_STREAM(ScreenLD->getValue());
             // Repeat above step for M and R
 
             // M
-            cv::findContours(maskM, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-            mask = maskM*0;
-            cv::drawContours(mask, contours, 0, (255), -1);
-            //cv::imshow("MidC", mask);
-            cv::meanStdDev(depth_mid, mean, stddev, mask);
-            //ROS_INFO_STREAM(mean.at<double>(0,0));
-            ScreenMD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
+            cv::minMaxLoc(depth_left, &min, &max, &loc1, &loc2, maskM);
+            ScreenMD->setValue(min*normA + normB);// Normalize [0-1]
             ROS_INFO_STREAM(mean.at<double>(0,0));
             ROS_INFO_STREAM(ScreenMD->getValue());
-            cv::findContours(maskR, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-            mask = maskL*0;
-            cv::drawContours(mask, contours, 0, (255), -1);
-            //cv::imshow("RightC", mask);
-            cv::meanStdDev(depth_right, mean, stddev, mask);
-            //ROS_INFO_STREAM(mean.at<double>(0,0));
-            ScreenRD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
+
+            // L
+            cv::minMaxLoc(depth_left, &min, &max, &loc1, &loc2, maskR);
+            ScreenRD->setValue(min*normA + normB);// Normalize [0-1]
             ROS_INFO_STREAM(mean.at<double>(0,0));
             ROS_INFO_STREAM(ScreenRD->getValue());
             // Compute
