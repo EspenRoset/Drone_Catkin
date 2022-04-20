@@ -261,6 +261,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             cv::Point loc1, loc2;
             cv::minMaxLoc(depth_left, &min, &max, &loc1, &loc2, maskL);
             // Set parameter on fuzzy regulator
+            if (min==0) {min = depth_thresh;}
             ScreenLD->setValue(min*normA + normB); // Normalize
             ROS_INFO_STREAM("Unnormalized and normalized distances, L, M, R: ");
             ROS_INFO_STREAM(min);
@@ -269,12 +270,14 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
 
             // M
             cv::minMaxLoc(depth_mid, &min, &max, &loc1, &loc2, maskM);
+            if (min==0) {min = depth_thresh;}
             ScreenMD->setValue(min*normA + normB);// Normalize [0-1]
             ROS_INFO_STREAM(min);
             ROS_INFO_STREAM(ScreenMD->getValue());
 
             // L
             cv::minMaxLoc(depth_right, &min, &max, &loc1, &loc2, maskR);
+            if (min==0) {min = depth_thresh;}
             ScreenRD->setValue(min*normA + normB);// Normalize [0-1]
             ROS_INFO_STREAM(min);
             ROS_INFO_STREAM(ScreenRD->getValue());
