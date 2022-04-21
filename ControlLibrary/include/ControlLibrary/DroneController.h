@@ -44,6 +44,7 @@ class DroneControl{
         float AvoidRoll = 0;
         float AvoidYawRate = 0;
         float StartingHeight = 0.0;
+        float ReturnBubblesize = 0.5;
         std::vector<std::vector<double>> ReturnWaypoints = {};
         double roll, pitch, yaw;
 
@@ -132,6 +133,7 @@ class DroneControl{
     void AdjustWaypoints();
     void RunDrone();
     bool check_position(std::vector<double> pos, double ErrorTolerance);
+    void AdjustBubblesize();
 };
 
 #endif

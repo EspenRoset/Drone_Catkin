@@ -128,7 +128,8 @@ void DroneControl::RunDrone(){
             ChangeToLocalFrame();
             CalcYawRate(); // Keep drone pointing towards next point
             AdjustWaypoints();
-            while (check_position(ReturnWaypoints.back(), 0.5 && ReturnWaypoints.size() > 1)){
+            AdjustBubblesize();
+            while (check_position(ReturnWaypoints.back(), ReturnBubblesize) && ReturnWaypoints.size() > 1){
                 ROS_INFO_STREAM("Going to the next waypoint");
                 ReturnWaypoints.pop_back();
             }
@@ -329,6 +330,37 @@ void DroneControl::YawDegrees(double degrees){
     ChangeToBodyFrame();
 }
 
+void DroneControl::AdjustBubblesize(){
+
+    if (ReturnWaypoints.size() > 11){
+
+    float x1 = ReturnWaypoints.back()[0] - current_position.pose.pose.position.x; // Move objective point
+    float y1 = ReturnWaypoints.back()[1] - current_position.pose.pose.position.y;
+    float scale = sqrt(pow(x1,2)+pow(y1,2));
+    x1 = x1/scale;
+    y1 = y1/scale;
+
+    float x2 = ReturnWaypoints[ReturnWaypoints.size()-10][0] - current_position.pose.pose.position.x;
+    float y2 = ReturnWaypoints[ReturnWaypoints.size()-10][1] - current_position.pose.pose.position.y;
+    scale = sqrt(pow(x2,2)+pow(y2,2));
+    x2 = x2/scale;
+    y2 = y2/scale;
+
+    float dot = x1*x2 + y1*y2; //dot product
+
+    
+    //float AvoidScale = 0.5;
+    if(((dot+1.1)/4)<0.12){
+        ReturnBubblesize = 0.12;
+    } else{
+        ReturnBubblesize = (dot+1.1)/4;
+    }
+    
+} else{
+    ReturnBubblesize = 0.2;
+    }
+}
+
 void DroneControl::AdjustWaypoints(){
     float x2 = ReturnWaypoints.back()[0] - current_position.pose.pose.position.x; // Move objective point
     float y2 = ReturnWaypoints.back()[1] - current_position.pose.pose.position.y;
@@ -344,5 +376,5 @@ void DroneControl::AdjustWaypoints(){
         ReturnWaypoints.back()[0] += (y2*AvoidScale*AvoidRoll);
         ReturnWaypoints.back()[1] -= (x2*AvoidScale*AvoidRoll);
     }
-
 }
+
