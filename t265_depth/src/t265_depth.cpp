@@ -355,16 +355,11 @@ namespace t265_depth
 
                 auto startTime = std::chrono::high_resolution_clock::now();
                 std::thread t([&]{
-                    {
-                    std::lock_guard<std::mutex> lock(sgbmM);
                     left_matcher->compute(undist_image_left_, undist_image_right_, left_disp);
-                    }
                 });
                 right_matcher->compute(undist_image_right_,undist_image_left_, right_disp);
                 
-                {
-                std::lock_guard<std::mutex> lock(sgbmM); 
-                }
+                t.join();
                 wls_filter->filter(left_disp, undist_image_left_, filtered_disp, right_disp);
                 auto endTime = std::chrono::high_resolution_clock::now();
                 auto compTime = (endTime-startTime);
