@@ -23,6 +23,9 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/exact_time.h>
 
+#include <thread>
+#include <mutex>
+
 using namespace cv;
 using namespace cv::ximgproc;
 using namespace std;
@@ -120,6 +123,8 @@ namespace t265_depth
         int texture_threshold_;
         int pre_filter_type_;
         int pre_filter_size_;
+
+        std::mutex sgbmM;
 
         // sgbm parameters
         bool use_sgbm_;
