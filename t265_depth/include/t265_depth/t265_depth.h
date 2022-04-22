@@ -71,8 +71,8 @@ namespace t265_depth
                                sensor_msgs::PointCloud2 &pointcloud);
 
     private:
-        void syncCallback(const sensor_msgs::Image::ConstPtr &image_msg_left,
-                          const sensor_msgs::Image::ConstPtr &image_msg_right);
+        void syncCallback(const sensor_msgs::CompressedImage::ConstPtr &image_msg_left,
+                          const sensor_msgs::CompressedImage::ConstPtr &image_msg_right);
 
         image_transport::ImageTransport it_;
         image_transport::Subscriber sub_img_left_;
@@ -141,8 +141,8 @@ namespace t265_depth
         float focal_length;
         float baseline = 0.064;
 
-        typedef message_filters::sync_policies::ExactTime<sensor_msgs::Image,
-                                                          sensor_msgs::Image>
+        typedef message_filters::sync_policies::ExactTime<sensor_msgs::CompressedImage,
+                                                          sensor_msgs::CompressedImage>
             MySyncPolicy;
         typedef message_filters::Synchronizer<MySyncPolicy>
             Sync;

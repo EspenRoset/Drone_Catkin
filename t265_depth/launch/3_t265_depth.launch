@@ -1,6 +1,6 @@
 <launch>
-    <arg name="input_topic_left" default="/camera/fisheye1/image_raw" />
-    <arg name="input_topic_right" default="/camera/fisheye2/image_raw" />
+    <arg name="input_topic_left" default="/camera/fisheye1/image_raw/compressed" />
+    <arg name="input_topic_right" default="/camera/fisheye2/image_raw/compressed" />
 
     <arg name="output_frame_id" default="t265_depth" />
     <arg name="process_every_nth_frame" default="1" />
