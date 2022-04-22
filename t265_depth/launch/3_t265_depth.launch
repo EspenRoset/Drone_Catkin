@@ -26,7 +26,7 @@
         
         # semiglobal disparity block matching correlation parameters
         <param name="use_sgbm" value="true" />         # Use SemiGlobalBlockMatching
-        <param name="sgbm_mode" value="0" />           # Mode type (0-SGBM,1-HH,2-3WAY)
+        <param name="sgbm_mode" value="2" />           # Mode type (0-SGBM,1-HH,2-3WAY)
         <param name="p1" value="240" /> # 8*3*5*2
         <param name="p2" value="960" /> # 8*3*5*2
         <param name="disp_12_max_diff" value="-1" />    # M aximum allowed difference (in integer pixel units) in the left-right disparity check. Set it to a non-positive value to disable the check.
