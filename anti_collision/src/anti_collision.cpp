@@ -261,27 +261,30 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             std::vector<cv::Vec4i> hierarchy;
             double min, max;
             cv::Point loc1, loc2;
-
-            cv::minMaxLoc(depth_left, &min, &max, &loc1, &loc2, maskL);
+            
+            cv::meanStdDev(depth_left, mean, stddev, maskL);
+            //cv::minMaxLoc(depth_left, &min, &max, &loc1, &loc2, maskL);
             // Set parameter on fuzzy regulator
             if (min==0) {min = depth_thresh;}
-            ScreenLD->setValue(min*normA + normB); // Normalize
+            ScreenLD->setValue(mean.at<double>(0,0)*normA + normB); // Normalize
             //ROS_INFO_STREAM("Unnormalized and normalized distances, L, M, R: ");
             //ROS_INFO_STREAM(min);
             //ROS_INFO_STREAM(ScreenLD->getValue());
             // Repeat above step for M and R
 
             // M
-            cv::minMaxLoc(depth_mid, &min, &max, &loc1, &loc2, maskM);
+            cv::meanStdDev(depth_left, mean, stddev, maskM);
+            //cv::minMaxLoc(depth_mid, &min, &max, &loc1, &loc2, maskM);
             if (min==0) {min = depth_thresh;}
-            ScreenMD->setValue(min*normA + normB);// Normalize [0-1]
+            ScreenMD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
             //ROS_INFO_STREAM(min);
             //ROS_INFO_STREAM(ScreenMD->getValue());
 
             // L
-            cv::minMaxLoc(depth_right, &min, &max, &loc1, &loc2, maskR);
+            cv::meanStdDev(depth_left, mean, stddev, maskR);
+            //cv::minMaxLoc(depth_right, &min, &max, &loc1, &loc2, maskR);
             if (min==0) {min = depth_thresh;}
-            ScreenRD->setValue(min*normA + normB);// Normalize [0-1]
+            ScreenRD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
             //ROS_INFO_STREAM(min);
             //ROS_INFO_STREAM(ScreenRD->getValue());
             // Compute
