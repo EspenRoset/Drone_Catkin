@@ -64,11 +64,11 @@ namespace t265_depth
         pub_disparity_ = it_.advertise("/disparity", 10);
         pub_pointcloud_ = node.advertise<sensor_msgs::PointCloud2>("/points2", 10);
         // Subscriber - sync policy
-        message_filters::Subscriber<sensor_msgs::CompressedImage> *image_sub_L_ptr; //SHADY Image -> CompressedImage 
-        message_filters::Subscriber<sensor_msgs::CompressedImage> *image_sub_R_ptr;
+        message_filters::Subscriber<sensor_msgs::Image> *image_sub_L_ptr; //SHADY Image -> Image 
+        message_filters::Subscriber<sensor_msgs::Image> *image_sub_R_ptr;
         Sync *sync_ptr;
-        image_sub_L_ptr = new message_filters::Subscriber<sensor_msgs::CompressedImage>();
-        image_sub_R_ptr = new message_filters::Subscriber<sensor_msgs::CompressedImage>();
+        image_sub_L_ptr = new message_filters::Subscriber<sensor_msgs::Image>();
+        image_sub_R_ptr = new message_filters::Subscriber<sensor_msgs::Image>();
         image_sub_L_ptr->subscribe(private_node, input_topic_left_, 1);
         image_sub_R_ptr->subscribe(private_node, input_topic_right_, 1);
 
@@ -80,8 +80,8 @@ namespace t265_depth
     {
     }
 
-    void t265Depth::syncCallback(const sensor_msgs::CompressedImage::ConstPtr &image_msg_left,
-                                 const sensor_msgs::CompressedImage::ConstPtr &image_msg_right)
+    void t265Depth::syncCallback(const sensor_msgs::Image::ConstPtr &image_msg_left,
+                                 const sensor_msgs::Image::ConstPtr &image_msg_right)
     {
         // ROS_INFO_STREAM_THROTTLE(2, "In syncCallback");
 
@@ -93,11 +93,11 @@ namespace t265_depth
 
         sensor_msgs::ImagePtr out_img_msg_left;
         sensor_msgs::ImagePtr out_img_msg_right;
-        image_left_ = cv::imdecode(cv::Mat(image_msg_left->data),1);
-        image_right_ = cv::imdecode(cv::Mat(image_msg_right->data),1);
+       // image_left_ = cv::imdecode(cv::Mat(image_msg_left->data),1);
+       // image_right_ = cv::imdecode(cv::Mat(image_msg_right->data),1);
         // SHADY STOP
-        //image_left_ = cv_bridge::toCvCopy(image_msg_left, "mono8")->image;
-        //image_right_ = cv_bridge::toCvCopy(image_msg_right, "mono8")->image;
+        image_left_ = cv_bridge::toCvCopy(image_msg_left, "mono8")->image;
+        image_right_ = cv_bridge::toCvCopy(image_msg_right, "mono8")->image;
         std_msgs::Header header_out = image_msg_left->header;
         if (scale_ < 1)
         {
@@ -112,7 +112,7 @@ namespace t265_depth
         }
         catch (cv_bridge::Exception &e)
         {
-            //ROS_ERROR("Could not convert from '%s' to 'mono8'.", image_msg_left->encoding.c_str());
+            ROS_ERROR("Could not convert from '%s' to 'mono8'.", image_msg_left->encoding.c_str());
             ROS_ERROR("SOME ERROR");
             return;
         }
