@@ -22,7 +22,7 @@ def GetDistance():
             time.sleep(.005)
             ToF.stop_ranging()
 
-            rospy.loginfo(str(distance))
+            #rospy.loginfo(str(distance))
             pub.publish(str(distance))
             rate.sleep()
 

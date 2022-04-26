@@ -238,14 +238,14 @@ namespace t265_depth
              0, 1, 0, -stereo_cy,
              0, 0, 0, stereo_focal_px,
              0, 0, (-1 / T[0]), 0);
-        auto startTime = std::chrono::high_resolution_clock::now();
+        //auto startTime = std::chrono::high_resolution_clock::now();
 
         cv::fisheye::initUndistortRectifyMap(K1, D1, R_left, P_left, stereo_size, CV_32FC1, lmapx_, lmapy_);
         cv::fisheye::initUndistortRectifyMap(K2, D2, R_right, P_right, stereo_size, CV_32FC1, rmapx_, rmapy_);
-        auto endTime = std::chrono::high_resolution_clock::now();
-        auto compTime = (endTime-startTime);
-        ROS_INFO("Undistort Time: ");
-        ROS_INFO_STREAM(compTime.count());
+        //auto endTime = std::chrono::high_resolution_clock::now();
+        //auto compTime = (endTime-startTime);
+       // ROS_INFO("Undistort Time: ");
+        //ROS_INFO_STREAM(compTime.count());
         publishCameraInfo(K1, K2, P_left, P_right, R_left, R_right);
         focal_length = P_left.at<float>(0, 0);
         baseline = std::abs(T[0]);
@@ -308,7 +308,7 @@ namespace t265_depth
 
         if (image_left_.rows > 0 && image_right_.rows > 0)
         {
-            auto startTime = std::chrono::high_resolution_clock::now();
+            //auto startTime = std::chrono::high_resolution_clock::now();
             if(do_rectify){
             cv::remap(image_left_, undist_image_left_, lmapx_, lmapy_, cv::INTER_LINEAR);
             cv::remap(image_right_, undist_image_right_, rmapx_, rmapy_, cv::INTER_LINEAR);
@@ -317,10 +317,10 @@ namespace t265_depth
                 undist_image_right_ = image_right_;
             }
             
-            auto endTime = std::chrono::high_resolution_clock::now();
-            auto compTime = (endTime-startTime);
-            ROS_INFO("Remap Time: ");
-            ROS_INFO_STREAM(compTime.count());
+            //auto endTime = std::chrono::high_resolution_clock::now();
+            //auto compTime = (endTime-startTime);
+            //ROS_INFO("Remap Time: ");
+            //ROS_INFO_STREAM(compTime.count());
             if (use_sgbm_)
             {
                 int mode;
@@ -357,15 +357,15 @@ namespace t265_depth
                 
 
 
-                auto startTime = std::chrono::high_resolution_clock::now();
+                //auto startTime = std::chrono::high_resolution_clock::now();
                 left_matcher->compute(undist_image_left_, undist_image_right_, left_disp);
                 right_matcher->compute(undist_image_right_,undist_image_left_, right_disp);
          
                 wls_filter->filter(left_disp, undist_image_left_, filtered_disp, right_disp);
-                auto endTime = std::chrono::high_resolution_clock::now();
-                auto compTime = (endTime-startTime);
-                ROS_INFO("SGBM compute Time: ");
-                ROS_INFO_STREAM(compTime.count());
+                //auto endTime = std::chrono::high_resolution_clock::now();
+                //auto compTime = (endTime-startTime);
+                //ROS_INFO("SGBM compute Time: ");
+                //ROS_INFO_STREAM(compTime.count());
             }
             else
             {
@@ -385,15 +385,15 @@ namespace t265_depth
                 wls_filter->setSigmaColor(1.5);
                 Ptr<StereoMatcher> right_matcher = createRightMatcher(left_matcher);
 
-                auto startTime = std::chrono::high_resolution_clock::now();
+               // auto startTime = std::chrono::high_resolution_clock::now();
                 left_matcher->compute(undist_image_left_, undist_image_right_, left_disp);
                 right_matcher->compute(undist_image_right_,undist_image_left_, right_disp);
                 wls_filter->filter(left_disp, undist_image_left_, filtered_disp, right_disp);
 
-                auto endTime = std::chrono::high_resolution_clock::now();
-                auto compTime = (endTime-startTime);
-                ROS_INFO("BM compute Time: ");
-                ROS_INFO_STREAM(compTime.count());
+                //auto endTime = std::chrono::high_resolution_clock::now();
+                //auto compTime = (endTime-startTime);
+                //ROS_INFO("BM compute Time: ");
+                //ROS_INFO_STREAM(compTime.count());
             }
             if (do_median_blur_)
             {

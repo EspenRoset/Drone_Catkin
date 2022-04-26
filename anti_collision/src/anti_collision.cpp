@@ -5,14 +5,14 @@ void analysis::FuzzyGetVelocities(float maxRoll, float maxPitch){
     float FuzzyRoll = analysis::Roll->getValue();
     float FuzzyPitch = analysis::Pitch->getValue();
     float FuzzyYaw = analysis::Yaw->getValue();
-    ROS_INFO("RAW FUZZY Roll-Pitch-Yaw:");
-    ROS_INFO_STREAM(FuzzyRoll);
-    ROS_INFO_STREAM(FuzzyPitch);
-    ROS_INFO_STREAM(FuzzyYaw);
+    //ROS_INFO("RAW FUZZY Roll-Pitch-Yaw:");
+    //ROS_INFO_STREAM(FuzzyRoll);
+    //ROS_INFO_STREAM(FuzzyPitch);
+    //ROS_INFO_STREAM(FuzzyYaw);
     //Scale Roll
     data[1] = -1*((maxRoll/0.5)*FuzzyRoll-maxRoll);
-    ROS_INFO("Speed Roll-Pitch-Yaw:");
-    ROS_INFO_STREAM(data[1]);
+    //ROS_INFO("Speed Roll-Pitch-Yaw:");
+    //ROS_INFO_STREAM(data[1]);
 
     //Scale Pitch
     if (FuzzyPitch>0.25f)
@@ -26,8 +26,8 @@ void analysis::FuzzyGetVelocities(float maxRoll, float maxPitch){
     }
     //Scale Yaw
     data[4] = -1*((maxYaw/0.5)*FuzzyYaw-maxYaw);
-    ROS_INFO_STREAM(data[0]);
-    ROS_INFO_STREAM(data[4]);
+    //ROS_INFO_STREAM(data[0]);
+    //ROS_INFO_STREAM(data[4]);
 
 }
 
@@ -266,24 +266,24 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             // Set parameter on fuzzy regulator
             if (min==0) {min = depth_thresh;}
             ScreenLD->setValue(min*normA + normB); // Normalize
-            ROS_INFO_STREAM("Unnormalized and normalized distances, L, M, R: ");
-            ROS_INFO_STREAM(min);
-            ROS_INFO_STREAM(ScreenLD->getValue());
+            //ROS_INFO_STREAM("Unnormalized and normalized distances, L, M, R: ");
+            //ROS_INFO_STREAM(min);
+            //ROS_INFO_STREAM(ScreenLD->getValue());
             // Repeat above step for M and R
 
             // M
             cv::minMaxLoc(depth_mid, &min, &max, &loc1, &loc2, maskM);
             if (min==0) {min = depth_thresh;}
             ScreenMD->setValue(min*normA + normB);// Normalize [0-1]
-            ROS_INFO_STREAM(min);
-            ROS_INFO_STREAM(ScreenMD->getValue());
+            //ROS_INFO_STREAM(min);
+            //ROS_INFO_STREAM(ScreenMD->getValue());
 
             // L
             cv::minMaxLoc(depth_right, &min, &max, &loc1, &loc2, maskR);
             if (min==0) {min = depth_thresh;}
             ScreenRD->setValue(min*normA + normB);// Normalize [0-1]
-            ROS_INFO_STREAM(min);
-            ROS_INFO_STREAM(ScreenRD->getValue());
+            //ROS_INFO_STREAM(min);
+            //ROS_INFO_STREAM(ScreenRD->getValue());
             // Compute
             analysis::FuzzyGetVelocities(maxRoll, maxPitch);
             verticalCheck(data);
