@@ -12,7 +12,7 @@ InputVariable: ScreenLD
   enabled: true
   range: 0.000 1.000
   lock-range: false
-  term: close Trapezoid 0.000 0.000 0.150 0.350
+  term: close Trapezoid 0.000 0.000 0.150 0.250
   term: medium Trapezoid 0.220 0.300 0.400 0.500
   term: far Trapezoid 0.400 0.550 1.000 1.000
 
@@ -28,7 +28,7 @@ InputVariable: ScreenMD
   enabled: true
   range: 0.000 1.000
   lock-range: false
-  term: close Trapezoid 0.000 0.000 0.150 0.350
+  term: close Trapezoid 0.000 0.000 0.150 0.250
   term: medium Trapezoid 0.220 0.300 0.400 0.500
   term: far Trapezoid 0.400 0.550 1.000 1.000
 
@@ -44,7 +44,7 @@ InputVariable: ScreenRD
   enabled: true
   range: 0.000 1.000
   lock-range: false
-  term: close Trapezoid 0.000 0.000 0.150 0.350
+  term: close Trapezoid 0.000 0.000 0.150 0.250
   term: medium Trapezoid 0.220 0.300 0.400 0.500
   term: far Trapezoid 0.400 0.550 1.000 1.000
 
