@@ -64,7 +64,7 @@ namespace t265_depth
         pub_disparity_ = it_.advertise("/disparity", 10);
         pub_pointcloud_ = node.advertise<sensor_msgs::PointCloud2>("/points2", 10);
         // Subscriber - sync policy
-        message_filters::Subscriber<sensor_msgs::CompressedImage> *image_sub_L_ptr;
+        message_filters::Subscriber<sensor_msgs::CompressedImage> *image_sub_L_ptr; //SHADY Image -> CompressedImage 
         message_filters::Subscriber<sensor_msgs::CompressedImage> *image_sub_R_ptr;
         Sync *sync_ptr;
         image_sub_L_ptr = new message_filters::Subscriber<sensor_msgs::CompressedImage>();
@@ -95,7 +95,7 @@ namespace t265_depth
         sensor_msgs::ImagePtr out_img_msg_right;
         image_left_ = cv::imdecode(cv::Mat(image_msg_left->data),1);
         image_right_ = cv::imdecode(cv::Mat(image_msg_right->data),1);
-
+        // SHADY STOP
         //image_left_ = cv_bridge::toCvCopy(image_msg_left, "mono8")->image;
         //image_right_ = cv_bridge::toCvCopy(image_msg_right, "mono8")->image;
         std_msgs::Header header_out = image_msg_left->header;

@@ -140,10 +140,10 @@ namespace t265_depth
         float stereo_cy;
         float focal_length;
         float baseline = 0.064;
-
+        // SHADY Image -> CompressedImage
         typedef message_filters::sync_policies::ExactTime<sensor_msgs::CompressedImage,
                                                           sensor_msgs::CompressedImage>
-            MySyncPolicy;
+            MySyncPolicy; // SHADYSTOP
         typedef message_filters::Synchronizer<MySyncPolicy>
             Sync;
     };
