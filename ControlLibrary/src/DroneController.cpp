@@ -58,7 +58,7 @@ void DroneControl::RunDrone(){
                     DroneControl::DroneTakeoff(StartingHeight + TakeoffAltitude); // Takes of and changes state to flying
                 }
             break;
-        case 2 /*Flying*/: // Get input from controller and update Targetpotsiion
+        case 2 /*Flying*/: // Get input from control-++ler and update Targetpotsiion
                 TargetPosition = InputTargetPosition; // Input from controller
                 TargetPosition.velocity.x = TargetPosition.velocity.x + AvoidReverse; // Obstacle avoidance
                 TargetPosition.velocity.y = TargetPosition.velocity.y + AvoidRoll;      // Obstacle avoidance
@@ -222,7 +222,16 @@ void DroneControl::DroneTakeoff(float altitude){ // Take off the drone and chang
         ROS_INFO_STREAM(current_position.pose.pose.position.z);
         ROS_INFO_STREAM("Initiating Takeoff");
         TargetPosition.velocity.z = 0.5;
-    }else if((current_position.pose.pose.position.z > altitude) || !Floor_limit) {
+
+        if((!Floor_limit) {
+            ROS_INFO_STREAM("Cruising altitude reached");
+            for (int i = 0; i<10; i++){
+            TargetPosition.velocity.z = 0;
+            }
+            InitiateTakeoff = false;
+            state = Flying;
+        }
+    } if((current_position.pose.pose.position.z > altitude) || !Floor_limit) {
         ROS_INFO_STREAM("Cruising altitude reached");
         for (int i = 0; i<10; i++){
         TargetPosition.velocity.z = 0;
