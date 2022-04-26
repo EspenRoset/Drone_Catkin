@@ -273,7 +273,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             // Repeat above step for M and R
 
             // M
-            cv::meanStdDev(depth_left, mean, stddev, maskM);
+            cv::meanStdDev(depth_mid, mean, stddev, maskM);
             //cv::minMaxLoc(depth_mid, &min, &max, &loc1, &loc2, maskM);
             if (min==0) {min = depth_thresh;}
             ScreenMD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
@@ -281,7 +281,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             //ROS_INFO_STREAM(ScreenMD->getValue());
 
             // L
-            cv::meanStdDev(depth_left, mean, stddev, maskR);
+            cv::meanStdDev(depth_right, mean, stddev, maskR);
             //cv::minMaxLoc(depth_right, &min, &max, &loc1, &loc2, maskR);
             if (min==0) {min = depth_thresh;}
             ScreenRD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
