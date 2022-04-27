@@ -223,7 +223,7 @@ void DroneControl::DroneTakeoff(float altitude){ // Take off the drone and chang
         ROS_INFO_STREAM("Initiating Takeoff");
         TargetPosition.velocity.z = 0.5;
 
-        if((!Floor_limit) {
+        if(!Floor_limit) {
             ROS_INFO_STREAM("Cruising altitude reached");
             for (int i = 0; i<10; i++){
             TargetPosition.velocity.z = 0;
