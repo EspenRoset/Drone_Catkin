@@ -208,7 +208,7 @@ void analysis::displaySystemReaction(cv::Mat dsp, std::vector<float> data)
     
     Proll = cv::Point(-data[1]*length, 0);
     Ppitch = cv::Point(0,-data[0]*length);
-    Pyaw = cv::Point(data[4]*length,0);
+    Pyaw = cv::Point(-data[4]*length,0);
     
     int lineType = 8;
     int thickness = 3;
@@ -216,7 +216,7 @@ void analysis::displaySystemReaction(cv::Mat dsp, std::vector<float> data)
     cv::arrowedLine(dsp, center, center+Proll, CV_RGB(255,0,0),thickness, lineType, 0, tipLength);
     cv::arrowedLine(dsp, center, center+Ppitch, CV_RGB(255,3.1415/2,0),thickness, lineType, 0, tipLength);
     cv::arrowedLine(dsp, center+cv::Point(0,-20), center+Pyaw+cv::Point(0,-20), CV_RGB(255,3.1415/2,0),thickness, lineType, 0, tipLength);
-    //cv::imshow("ARROW", dsp);
+    cv::imshow("ARROW", dsp);
     cv::waitKey(1);
 }
 
@@ -254,37 +254,66 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             double img_areaL = double(maskL.rows * maskL.cols);
             double img_areaM = double(maskM.rows * maskM.cols);
             double img_areaR = double(maskR.rows * maskR.cols);
-            ScreenLS->setValue(sL/img_areaL);
-            ScreenMS->setValue(sM/img_areaM);
-            ScreenRS->setValue(sR/img_areaR);
+            double sizeL = sL/img_areaL;
+            double sizeM = sM/img_areaM;
+            double sizeR = sR/img_areaR;
+            ScreenLS->setValue(sizeL);
+            ScreenMS->setValue(sizeM);
+            ScreenRS->setValue(sizeR);
             std::vector<std::vector<cv::Point>> contours;
             std::vector<cv::Vec4i> hierarchy;
             double min, max;
             cv::Point loc1, loc2;
             
-            cv::meanStdDev(depth_left, mean, stddev, maskL);
+            
             //cv::minMaxLoc(depth_left, &min, &max, &loc1, &loc2, maskL);
             // Set parameter on fuzzy regulator
-            if (min==0) {min = depth_thresh;}
-            ScreenLD->setValue(mean.at<double>(0,0)*normA + normB); // Normalize
+            if (sizeL>0.1)
+            {
+                cv::meanStdDev(depth_left, mean, stddev, maskL);
+                ScreenLD->setValue(mean.at<double>(0,0)*normA + normB); // Normalize
+            }
+            else
+            {
+                ScreenLD->setValue(160.0);
+            }
+            
+            
             //ROS_INFO_STREAM("Unnormalized and normalized distances, L, M, R: ");
             //ROS_INFO_STREAM(min);
             //ROS_INFO_STREAM(ScreenLD->getValue());
             // Repeat above step for M and R
 
             // M
-            cv::meanStdDev(depth_mid, mean, stddev, maskM);
+            
             //cv::minMaxLoc(depth_mid, &min, &max, &loc1, &loc2, maskM);
-            if (min==0) {min = depth_thresh;}
-            ScreenMD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
+        
+            if (sizeM>0.1)
+            {
+                cv::meanStdDev(depth_mid, mean, stddev, maskM);
+                ScreenMD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
+            }
+            else
+            {
+                ScreenMD->setValue(160.0);
+            }
+            
             //ROS_INFO_STREAM(min);
             //ROS_INFO_STREAM(ScreenMD->getValue());
 
             // L
-            cv::meanStdDev(depth_right, mean, stddev, maskR);
+           
             //cv::minMaxLoc(depth_right, &min, &max, &loc1, &loc2, maskR);
-            if (min==0) {min = depth_thresh;}
-            ScreenRD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
+            if (sizeR>0.1)
+            {
+                cv::meanStdDev(depth_right, mean, stddev, maskR);
+                ScreenRD->setValue(mean.at<double>(0,0)*normA + normB);// Normalize [0-1]
+            }
+            else
+            {
+                ScreenRD->setValue(160.0);
+            }
+            
             //ROS_INFO_STREAM(min);
             //ROS_INFO_STREAM(ScreenRD->getValue());
             // Compute
@@ -297,7 +326,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             //cv::imshow("Left", depth_left);
             //cv::imshow("Mid", depth_mid);
             //cv::imshow("Right", depth_right);
-            analysis::displaySystemReaction(disparity, data);
+            //analysis::displaySystemReaction(disparity, data);
             
             //cv::imshow("L", depth_left);
             //cv::imshow("M", depth_mid);
