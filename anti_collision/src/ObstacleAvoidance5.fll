@@ -133,8 +133,8 @@ RuleBlock: mamdani
  rule: if ScreenLS is large and ScreenMS is medium then Yaw is right
  rule: if ScreenRS is large and ScreenMS is medium then Yaw is left
 
- rule: if ScreenLS is large and ScreenMD is small and ScreenRS is large then Yaw is stay
- rule: if ScreenLS is large and ScreenMD is small and ScreenRS is medium then Yaw is stay
- rule: if ScreenLS is medium and ScreenMD is small and ScreenRS is large then Yaw is stay
+ rule: if ScreenLS is large and ScreenMS is small and ScreenRS is large then Yaw is stay
+ rule: if ScreenLS is large and ScreenMS is small and ScreenRS is medium then Yaw is stay
+ rule: if ScreenLS is medium and ScreenMS is small and ScreenRS is large then Yaw is stay
 
  
