@@ -239,9 +239,9 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             int sliceIndex = depth_map.cols/3;
 
             int midOffset = 10;
-            cv::Mat depth_left = depth_map(cv::Range(50,dR-150),cv::Range(0, sliceIndex));
-            cv::Mat depth_mid = depth_map(cv::Range(50,dR-150),cv::Range(sliceIndex-midOffset, 2*sliceIndex+midOffset));
-            cv::Mat depth_right = depth_map(cv::Range(50,dR-150),cv::Range(2*sliceIndex, 3*sliceIndex));
+            cv::Mat depth_left = depth_map(cv::Range(0,dR),cv::Range(0, sliceIndex));
+            cv::Mat depth_mid = depth_map(cv::Range(0,dR),cv::Range(sliceIndex-midOffset, 2*sliceIndex+midOffset));
+            cv::Mat depth_right = depth_map(cv::Range(0,dR),cv::Range(2*sliceIndex, 3*sliceIndex));
             cv::Mat mean, stddev, mask, maskL, maskM, maskR;
 
             // Mask to segment regions with depth less than safe distance
