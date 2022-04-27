@@ -3,7 +3,7 @@
     <arg name="input_topic_right" default="/camera/fisheye2/image_raw" />
 
     <arg name="output_frame_id" default="t265_depth" />
-    <arg name="process_every_nth_frame" default="1" />
+    <arg name="process_every_nth_frame" default="2" />
     
     <arg name="param_file_path" default="$(find t265_depth)/cfg/half_res.yaml" />
     <arg name="scale" default="0.5" /> # 1, 0.5 or 0.33
