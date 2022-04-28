@@ -138,7 +138,7 @@ void DroneControl::RunDrone(){
             TargetPosition.position.z = ReturnWaypoints.back()[2];
             TargetPosition.yaw_rate = 0;
 
-            if (AvoidReverse > 0){
+            if (AvoidReverse < 0){
                 state = ReturnHomeAvoidance;
             }
 
@@ -156,7 +156,7 @@ void DroneControl::RunDrone(){
 
             break;
         case 7 /*ReturnHomeAvoidance*/: //Avoid obstacles on the way home
-            if (AvoidReverse > 0){
+            if (AvoidReverse < 0){
                 ROS_INFO("RTH AVOIDANCE !");
                 ChangeToBodyFrame();
                 TargetPosition.position.x = 0;
