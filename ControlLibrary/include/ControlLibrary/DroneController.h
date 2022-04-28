@@ -48,6 +48,7 @@ class DroneControl{
         float StartingHeight = 0.0;
         float ReturnBubblesize = 0.5;
         float RTHAvoidanceHeight = 0.5;
+        float AdjustHeight = 0.0;
         std::vector<std::vector<double>> ReturnWaypoints = {};
         double roll, pitch, yaw;
 

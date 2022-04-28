@@ -171,8 +171,9 @@ void DroneControl::RunDrone(){
                 TargetPosition.velocity.x = -1;
 
             } else {
+
                 if (!RTHHeightAdjusted){
-                    float AdjustHeight = current_position.pose.pose.position.z + RTHAvoidanceHeight;
+                    AdjustHeight = current_position.pose.pose.position.z + RTHAvoidanceHeight;
                     RTHHeightAdjusted = true;
                 }
                 if (current_position.pose.pose.position.z < AdjustHeight){ // Go up 1 m
