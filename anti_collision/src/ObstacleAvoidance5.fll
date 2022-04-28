@@ -100,19 +100,19 @@ RuleBlock: mamdani
  rule: if ScreenMD is medium then Pitch is reverse
  rule: if ScreenMD is close then Pitch is hardReverse
 
- rule: if ScreenLD is far then Roll is stay
- rule: if ScreenLD is medium then Roll is right
- rule: if ScreenLD is close then Roll is hardRight
+ #rule: if ScreenLD is far then Roll is stay
+ #rule: if ScreenLD is medium then Roll is right
+ #rule: if ScreenLD is close then Roll is hardRight
 
- rule: if ScreenRD is far then Roll is stay
- rule: if ScreenRD is medium then Roll is left
- rule: if ScreenRD is close then Roll is hardLeft
+ #rule: if ScreenRD is far then Roll is stay
+ #rule: if ScreenRD is medium then Roll is left
+ #rule: if ScreenRD is close then Roll is hardLeft
 
- rule: if ScreenLD is medium and ScreenMD is medium and ScreenRD is far then Roll is right
- rule: if ScreenLD is far and ScreenMD is medium and ScreenRD is medium then Roll is left
+ #rule: if ScreenLD is medium and ScreenMD is medium and ScreenRD is far then Roll is right
+ #rule: if ScreenLD is far and ScreenMD is medium and ScreenRD is medium then Roll is left
 
- rule: if ScreenLD is close and ScreenMD is close and ScreenRD is far then Roll is hardRight
- rule: if ScreenLD is far and ScreenMD is close and ScreenRD is close then Roll is hardLeft 
+ #rule: if ScreenLD is close and ScreenMD is close and ScreenRD is far then Roll is hardRight
+ #rule: if ScreenLD is far and ScreenMD is close and ScreenRD is close then Roll is hardLeft 
 
  #rule: if ScreenLS is large and ScreenLD is medium then Roll is right
  #rule: if ScreenLS is medium and ScreenLD is medium then Roll is right
