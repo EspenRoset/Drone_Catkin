@@ -182,8 +182,8 @@ void DroneControl::RunDrone(){
                     TargetPosition.velocity.z = 0.5;
                 } else {
                     RTHHeightAdjusted = false;
-                    if (ReturnWaypoints.size() > 7){
-                        for(int i = 1; i < 6; i++){
+                    if (ReturnWaypoints.size() > 13){
+                        for(int i = 1; i < 12; i++){
                             ReturnWaypoints[ReturnWaypoints.size()-i][2] = current_position.pose.pose.position.z;
                         }
                     }
