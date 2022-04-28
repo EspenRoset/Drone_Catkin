@@ -127,7 +127,7 @@ void DroneControl::RunDrone(){
         case 6 /*ReturnHome*/: //Follow waypoints back home
             ChangeToLocalFrame();
             CalcYawRate(); // Keep drone pointing towards next point
-            AdjustWaypoints();
+            //AdjustWaypoints();
             AdjustBubblesize();
             while (check_position(ReturnWaypoints.back(), ReturnBubblesize) && ReturnWaypoints.size() > 1){
                 ROS_INFO_STREAM("Going to the next waypoint");
@@ -137,6 +137,10 @@ void DroneControl::RunDrone(){
             TargetPosition.position.y = ReturnWaypoints.back()[1];
             TargetPosition.position.z = ReturnWaypoints.back()[2];
             TargetPosition.yaw_rate = 0;
+
+            if (AvoidReverse > 0){
+                state = ReturnHomeAvoidance;
+            }
 
             if (ReturnWaypoints.size() <= 1){
                 InitiateReturn = false;
@@ -152,6 +156,17 @@ void DroneControl::RunDrone(){
 
             break;
         case 7 /*ReturnHomeAvoidance*/: //Avoid obstacles on the way home
+            if (AvoidReverse > 0){
+                ChangeToBodyFrame();
+                TargetPosition.position.x = 0;
+                TargetPosition.position.y = 0;
+                TargetPosition.position.z = 0;
+                TargetPosition.velocity.x = -1;
+            } else {
+                ChangeToLocalFrame();
+                TargetPosition.velocity.x = 0;
+                ReturnWaypoints.pop_back();
+            }
             // 1 - Stop drone
             // 2 - Yaw to check safety in opposite direction of obstacle
             // 3 - If safe then set a new waypoiny away from obstacle
