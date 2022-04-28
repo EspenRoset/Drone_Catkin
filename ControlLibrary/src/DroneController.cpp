@@ -46,7 +46,7 @@ void DroneControl::RunDrone(){
                 }
                 //DroneControl::PX4Arm();
                 ResetWaypoints();
-                AddWaypoint();
+                AddWaypoint(0,0,0);
 
                 StartingHeight = current_position.pose.pose.position.z; //Reference height used for calcing takeoff height
                 ROS_INFO_STREAM("Waiting for Takeoff command (Rb + A)");
@@ -87,7 +87,7 @@ void DroneControl::RunDrone(){
                 }else {
                     StartingHeight = current_position.pose.pose.position.z;
                     ResetWaypoints();
-                    AddWaypoint();
+                    AddWaypoint(0,0,0);
                     state = Takeoff;
                 }
             break;
@@ -160,7 +160,7 @@ void DroneControl::RunDrone(){
             if (AvoidReverse < 0){
                 ROS_INFO("RTH AVOIDANCE !");
                 if ((abs(AvoidRoll)>0.1) && !WaypointAdjusted){
-                    AdjustWaypoints();
+                //    AdjustWaypoints();
                     ROS_INFO("Adjusted waypoint");
                     WaypointAdjusted = true;
                 }
@@ -171,6 +171,8 @@ void DroneControl::RunDrone(){
                 TargetPosition.velocity.x = -1;
 
             } else {
+                ReturnWaypoints.back()[2] += 0.25; // Adjust waypoint up
+                Addwaypoint(0,0,0.25); // Move drone up
                 WaypointAdjusted = false;
                 state=ReturnHome;
             }
@@ -186,7 +188,7 @@ void DroneControl::RunDrone(){
         }
         
         if((state != ReturnHome) && !check_position(ReturnWaypoints.back(), 0.1)){
-            AddWaypoint();
+            AddWaypoint(0,0,0);
         }
         pos_pub.publish(TargetPosition);
         rate_->sleep();
@@ -306,13 +308,13 @@ void DroneControl::ResetWaypoints(){
     ROS_INFO("After clear()");
 }
 
-void DroneControl::AddWaypoint(){
+void DroneControl::AddWaypoint(float deltax, float deltay, float deltaz){
     ROS_INFO("Before try statement");
     try{
     ReturnWaypoints.push_back({
-        current_position.pose.pose.position.x,
-        current_position.pose.pose.position.y,
-        current_position.pose.pose.position.z});
+        current_position.pose.pose.position.x + deltax,
+        current_position.pose.pose.position.y + deltay,
+        current_position.pose.pose.position.z + deltaz});
     } catch(std::exception &e){
         ROS_INFO_STREAM(e.what());
         ROS_INFO_STREAM(ReturnWaypoints.size());

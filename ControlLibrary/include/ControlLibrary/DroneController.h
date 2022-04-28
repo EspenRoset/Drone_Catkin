@@ -81,7 +81,7 @@ class DroneControl{
         void DroneTakeoff(float altitude);
         void DroneLand();
         void ResetWaypoints();
-        void AddWaypoint();
+        void AddWaypoint(float deltax, float deltay, float deltaz);
         void ChangeToBodyFrame();
         void ChangeToLocalFrame();
         float CalcYawRate();
