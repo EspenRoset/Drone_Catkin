@@ -359,14 +359,14 @@ void DroneControl::AdjustBubblesize(){
 
     
     //float AvoidScale = 0.5;
-    if(((dot+1.1)/4)<0.12){
-        ReturnBubblesize = 0.12;
+    if(((dot+2.1)/4)<0.2){
+        ReturnBubblesize = 0.25;
     } else{
-        ReturnBubblesize = (dot+1.1)/4;
+        ReturnBubblesize = (dot+2.1)/4;
     }
     
 } else{
-    ReturnBubblesize = 0.2;
+    ReturnBubblesize = 0.25;
     }
 }
 
