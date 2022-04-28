@@ -135,11 +135,10 @@ void DroneControl::RunDrone(){
             }
             TargetPosition.position.x = ReturnWaypoints.back()[0];
             TargetPosition.position.y = ReturnWaypoints.back()[1];
-            if (!RTHHeightAdjusted){
-            TargetPosition.position.z = ReturnWaypoints.back()[2];
-            } else {
-                TargetPosition.position.z = current_position.pose.pose.position.z;
+            if (RTHHeightAdjusted){
+            TargetPosition.position.z = ReturnWaypoints.back()[2] + 1;
             }
+        
             TargetPosition.yaw_rate = 0;
 
             if (AvoidReverse < 0){
@@ -164,7 +163,7 @@ void DroneControl::RunDrone(){
             if (AvoidReverse < 0){
                 ROS_INFO("RTH AVOIDANCE !");
                 if ((abs(AvoidRoll)>0.1) && !WaypointAdjusted){
-                //    AdjustWaypoints();
+                //  AdjustWaypoints();
                     ROS_INFO("Adjusted waypoint");
                     WaypointAdjusted = true;
                 }
@@ -389,7 +388,7 @@ void DroneControl::AdjustBubblesize(){
 
     
     //float AvoidScale = 0.5;
-    if(((dot+2.1)/4)<0.2){
+    if(((dot+1.3)/4)<0.2){
         ReturnBubblesize = 0.25;
     } else{
         ReturnBubblesize = (dot+2.1)/4;
