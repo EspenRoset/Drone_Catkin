@@ -316,8 +316,8 @@ namespace t265_depth
                 undist_image_left_ = image_left_;
                 undist_image_right_ = image_right_;
             }
-            undist_image_left_ = undist_image_left_(cv::Range(150,undist_image_left_.rows-300),cv::Range(0, undist_image_left_.cols));
-            undist_image_right_ = undist_image_right_(cv::Range(150,undist_image_right_.rows-300),cv::Range(0, undist_image_right_.cols));
+            undist_image_left_ = undist_image_left_(cv::Range(250,undist_image_left_.rows-300),cv::Range(0, undist_image_left_.cols));
+            undist_image_right_ = undist_image_right_(cv::Range(250,undist_image_right_.rows-300),cv::Range(0, undist_image_right_.cols));
             //auto endTime = std::chrono::high_resolution_clock::now();
             //auto compTime = (endTime-startTime);
             //ROS_INFO("Remap Time: ");
