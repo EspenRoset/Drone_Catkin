@@ -238,7 +238,7 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             // Split into three equal separate depth maps Left(L), Mid(M), Right(R)
             int sliceIndex = depth_map.cols/3;
 
-            int midOffset = 10;
+            int midOffset = 30;
             cv::Mat depth_left = depth_map(cv::Range(0,dR),cv::Range(0, sliceIndex));
             cv::Mat depth_mid = depth_map(cv::Range(0,dR),cv::Range(sliceIndex-midOffset, 2*sliceIndex+midOffset));
             cv::Mat depth_right = depth_map(cv::Range(0,dR),cv::Range(2*sliceIndex, 3*sliceIndex));
@@ -334,7 +334,6 @@ void analysis::detectobject(const sensor_msgs::ImageConstPtr& msg)
             //cv::imshow("LC", maskL);
             //cv::imshow("MC", maskM);
             //cv::imshow("RC", maskR);
-            
             //cv::waitKey(1);
 
 
