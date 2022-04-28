@@ -159,9 +159,10 @@ void DroneControl::RunDrone(){
         case 7 /*ReturnHomeAvoidance*/: //Avoid obstacles on the way home
             if (AvoidReverse < 0){
                 ROS_INFO("RTH AVOIDANCE !");
-                if (abs(AvoidRoll)>0.1){
+                if ((abs(AvoidRoll)>0.1) && !WaypointAdjusted){
                     AdjustWaypoints();
                     ROS_INFO("Adjusted waypoint");
+                    WaypointAdjusted = true;
                 }
                 ChangeToBodyFrame();
                 TargetPosition.position.x = 0;
@@ -170,6 +171,7 @@ void DroneControl::RunDrone(){
                 TargetPosition.velocity.x = -1;
 
             } else {
+                WaypointAdjusted = false;
                 state=ReturnHome;
             }
             // 1 - Stop drone

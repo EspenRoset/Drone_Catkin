@@ -39,6 +39,7 @@ class DroneControl{
         bool Obstacle_detected = false;
         bool Roof_limit = false;
         bool Floor_limit = false;
+        bool WaypointAdjusted;
         std::vector<float> Obstacle_position;
         float AvoidReverse = 0;
         float AvoidRoll = 0;
