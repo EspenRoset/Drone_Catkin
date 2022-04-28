@@ -135,7 +135,11 @@ void DroneControl::RunDrone(){
             }
             TargetPosition.position.x = ReturnWaypoints.back()[0];
             TargetPosition.position.y = ReturnWaypoints.back()[1];
+            if (!RTHHeightAdjusted){
             TargetPosition.position.z = ReturnWaypoints.back()[2];
+            } else {
+                TargetPosition.position.z = current_position.pose.pose.position.z;
+            }
             TargetPosition.yaw_rate = 0;
 
             if (AvoidReverse < 0){
@@ -172,6 +176,7 @@ void DroneControl::RunDrone(){
 
             } else {
                 ROS_INFO("Increasing height maybe ? :/");
+                RTHHeightAdjusted = true;
                 ReturnWaypoints.back()[2] += 1; // Adjust waypoint up
                 AddWaypoint(0,0,1); // Move drone up
                 WaypointAdjusted = false;
@@ -289,7 +294,7 @@ bool DroneControl::check_position(std::vector<double> pos, double ErrorTolerance
   double Errorx = pos[0] - current_position.pose.pose.position.x;
   double Errory = pos[1] - current_position.pose.pose.position.y;
   double Errorz = pos[2] - current_position.pose.pose.position.z;
-
+  
   double magnitude = std::sqrt((Errorx * Errorx) + (Errory * Errory) + (Errorz * Errorz));
  
   if (magnitude < ErrorTolerance)
