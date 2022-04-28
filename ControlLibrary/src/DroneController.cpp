@@ -404,7 +404,7 @@ void DroneControl::AdjustBubblesize(){
     if(((dot+1.3)/4)<0.2){
         ReturnBubblesize = 0.25;
     } else{
-        ReturnBubblesize = (dot+2.1)/4;
+        ReturnBubblesize = (dot+1.3)/4;
     }
     
 } else{
