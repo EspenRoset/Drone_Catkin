@@ -172,7 +172,7 @@ void DroneControl::RunDrone(){
 
             } else {
                 ReturnWaypoints.back()[2] += 0.25; // Adjust waypoint up
-                Addwaypoint(0,0,0.25); // Move drone up
+                AddWaypoint(0,0,0.25); // Move drone up
                 WaypointAdjusted = false;
                 state=ReturnHome;
             }
