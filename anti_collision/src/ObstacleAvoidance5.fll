@@ -124,8 +124,10 @@ RuleBlock: mamdani
  #rule: if ScreenRS is large and ScreenRD is close then Roll is hardLeft
  #rule: if ScreenRS is medium and ScreenRD is close then Roll is hardLeft
 
- rule: if ScreenLS is large then Yaw is right
- rule: if ScreenRS is large then Yaw is left
+ rule: if ScreenLS is large and ScreenLD is close then Yaw is right
+ rule: if ScreenLS is large and ScreenLD is close then Roll is hardRight
+ rule: if ScreenRS is large and ScreenRD is close then Yaw is left
+ rule: if ScreenRS is large and ScreenRD is close then Roll is hardLeft
  
  rule: if ScreenLS is large and ScreenMS is large then Yaw is hardRight
  rule: if ScreenRS is large and ScreenMS is large then Yaw is hardLeft
