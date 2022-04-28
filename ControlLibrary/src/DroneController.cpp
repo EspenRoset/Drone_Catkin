@@ -171,8 +171,9 @@ void DroneControl::RunDrone(){
                 TargetPosition.velocity.x = -1;
 
             } else {
-                ReturnWaypoints.back()[2] += 0.25; // Adjust waypoint up
-                AddWaypoint(0,0,0.25); // Move drone up
+                ROS_INFO("Increasing height maybe ? :/");
+                ReturnWaypoints.back()[2] += 1; // Adjust waypoint up
+                AddWaypoint(0,0,1); // Move drone up
                 WaypointAdjusted = false;
                 state=ReturnHome;
             }
