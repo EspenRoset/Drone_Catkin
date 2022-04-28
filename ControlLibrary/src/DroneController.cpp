@@ -161,6 +161,7 @@ void DroneControl::RunDrone(){
                 ROS_INFO("RTH AVOIDANCE !");
                 if (abs(AvoidRoll)>0.1){
                     AdjustWaypoints();
+                    ROS_INFO("Adjusted waypoint");
                 }
                 ChangeToBodyFrame();
                 TargetPosition.position.x = 0;
