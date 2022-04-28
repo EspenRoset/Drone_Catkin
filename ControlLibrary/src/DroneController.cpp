@@ -135,12 +135,7 @@ void DroneControl::RunDrone(){
             }
             TargetPosition.position.x = ReturnWaypoints.back()[0];
             TargetPosition.position.y = ReturnWaypoints.back()[1];
-            if (RTHHeightAdjusted){
-                TargetPosition.position.z = ReturnWaypoints.back()[2] + 1;
-            } else{
-                TargetPosition.position.z = ReturnWaypoints.back()[2];
-            }
-        
+            TargetPosition.position.z = ReturnWaypoints.back()[2];    
             TargetPosition.yaw_rate = 0;
 
             if (AvoidReverse < 0){
@@ -176,12 +171,25 @@ void DroneControl::RunDrone(){
                 TargetPosition.velocity.x = -1;
 
             } else {
+                if (!RTHHeightAdjusted){
+                    float AdjustHeight = current_position.pose.pose.position.z + RTHAvoidanceHeight;
+                    RTHHeightAdjusted = true;
+                }
+                if (current_position.pose.pose.position.z < AdjustHeight){ // Go up 1 m
+                    TargetPosition.velocity.z = 0.5;
+                } else {
+                    RTHHeightAdjusted = false;
+                    state = ReturnHome;
+                }
+
+                /*
                 ROS_INFO("Increasing height maybe ? :/");
                 RTHHeightAdjusted = true;
                 ReturnWaypoints.back()[2] += 1; // Adjust waypoint up
                 AddWaypoint(0,0,1); // Move drone up
                 WaypointAdjusted = false;
-                state=ReturnHome;
+                state=ReturnHome; 
+                */
             }
             // 1 - Stop drone
             // 2 - Yaw to check safety in opposite direction of obstacle
