@@ -136,7 +136,9 @@ void DroneControl::RunDrone(){
             TargetPosition.position.x = ReturnWaypoints.back()[0];
             TargetPosition.position.y = ReturnWaypoints.back()[1];
             if (RTHHeightAdjusted){
-            TargetPosition.position.z = ReturnWaypoints.back()[2] + 1;
+                TargetPosition.position.z = ReturnWaypoints.back()[2] + 1;
+            } else{
+                TargetPosition.position.z = ReturnWaypoints.back()[2];
             }
         
             TargetPosition.yaw_rate = 0;
