@@ -182,6 +182,11 @@ void DroneControl::RunDrone(){
                     TargetPosition.velocity.z = 0.5;
                 } else {
                     RTHHeightAdjusted = false;
+                    if (ReturnWaypoints.size() > 7){
+                        for(int i = 1; i < 6; i++){
+                            ReturnWaypoints[ReturnWaypoints.size()-i][2] = current_position.pose.pose.position.z;
+                        }
+                    }
                     state = ReturnHome;
                 }
 
@@ -205,7 +210,7 @@ void DroneControl::RunDrone(){
             break;
         }
         
-        if((state != ReturnHome) && !check_position(ReturnWaypoints.back(), 0.1)){
+        if((state != ReturnHome) && !check_position(ReturnWaypoints.back(), 0.1) && (state != ReturnHomeAvoidance)){
             AddWaypoint(0,0,0);
         }
         pos_pub.publish(TargetPosition);
