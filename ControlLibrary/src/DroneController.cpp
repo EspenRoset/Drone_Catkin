@@ -404,14 +404,14 @@ void DroneControl::AdjustBubblesize(){
 
     
     //float AvoidScale = 0.5;
-    if(((dot+1.3)/4)<0.2){
-        ReturnBubblesize = 0.15;
+    if(((dot+0.75)/4)<0.2){
+        ReturnBubblesize = 0.2;
     } else{
-        ReturnBubblesize = (dot+1.3)/4;
+        ReturnBubblesize = (dot+0.75)/4;
     }
     
 } else{
-    ReturnBubblesize = 0.15;
+    ReturnBubblesize = 0.2;
     }
     ROS_INFO("Bubblesize: ");
     ROS_INFO_STREAM(ReturnBubblesize);
