@@ -232,6 +232,18 @@ void DroneControl::RunDrone(){
             // Log positions at set interval(0.1) if state is not ReturnHome or ReturnHomeAvoidance
             AddWaypoint(0,0,0);
         }
+        ROS_INFO("Frame: ");
+        ROS_INFO_STREAM(TargetPosition.coordinate_frame);
+        ROS_INFO("Velocities: ");
+        ROS_INFO_STREAM(TargetPosition.velocity.x);
+        ROS_INFO_STREAM(TargetPosition.velocity.y);
+        ROS_INFO_STREAM(TargetPosition.velocity.z);
+        ROS_INFO("Positions: ");
+        ROS_INFO_STREAM(TargetPosition.position.x);
+        ROS_INFO_STREAM(TargetPosition.position.y);
+        ROS_INFO_STREAM(TargetPosition.position.z);
+        
+
         pos_pub.publish(TargetPosition);
         rate_->sleep();
     }
