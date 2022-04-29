@@ -5,7 +5,7 @@ import time
 
 ToF = qwiic.QwiicVL53L1X(41, BusId=0)
 ToF.sensor_init()
-ToF.set_distance_mode(2)
+ToF.set_distance_mode(1)
 
 def GetDistance():
     pub = rospy.Publisher('distance_up', String, queue_size=10)
@@ -18,6 +18,7 @@ def GetDistance():
             distance = ToF.get_distance()  # Get the result of the measurement from the sensor
             time.sleep(.005)
             ToF.stop_ranging()
+            print(ToF.get_range_status())
 
             #rospy.loginfo(str(distance))
             pub.publish(str(distance))
