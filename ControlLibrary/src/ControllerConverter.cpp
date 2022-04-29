@@ -70,7 +70,7 @@ void ControllerConverter::UpdateVelocities(){
         if (abs(ControllerConverter::Target.velocity.z) < 0.05){
             ControllerConverter::Target.velocity.z = 0;
         }
-        if (abs(ControllerConverter::Target.velocity.yaw_rate) < 0.05){
+        if (abs(ControllerConverter::Target.yaw_rate) < 0.05){
             ControllerConverter::Target.yaw_rate = 0;
         }
         
