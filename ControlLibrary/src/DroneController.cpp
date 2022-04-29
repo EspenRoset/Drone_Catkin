@@ -61,12 +61,14 @@ void DroneControl::RunDrone(){
                 }
             break;
         case 2 /*Flying*/: // Get input from control-++ler and update Targetpotsiion
+                if (!PositionHold){
                 TargetPosition = InputTargetPosition; // Input from controller
+                }
                 TargetPosition.velocity.x = TargetPosition.velocity.x + AvoidReverse; // Obstacle avoidance
                 TargetPosition.velocity.y = TargetPosition.velocity.y + AvoidRoll;    // Obstacle avoidance
                 TargetPosition.yaw_rate = TargetPosition.yaw_rate + AvoidYawRate;
                 
-                if (TargetPosition.velocity.x == 0 && TargetPosition.velocity.y == 0 && TargetPosition.yaw_rate == 0 && !PositionHold){
+                if (InputTargetPosition.velocity.x == 0 && InputTargetPosition.velocity.y == 0 && InputTargetPosition.yaw_rate == 0 && !PositionHold){
                     ChangeToLocalFrame();
                     ROS_INFO("Setpoint set");
                     TargetPosition.position.x = current_position.pose.pose.position.x;
@@ -74,7 +76,7 @@ void DroneControl::RunDrone(){
                     TargetPosition.position.z = current_position.pose.pose.position.z;
                     PositionHold = true;
                 } 
-                if ((TargetPosition.velocity.x != 0 || TargetPosition.velocity.y != 0 || TargetPosition.yaw_rate != 0) && PositionHold){
+                if ((InputTargetPosition.velocity.x != 0 || InputTargetPosition.velocity.y != 0 || InputTargetPosition.yaw_rate != 0) && PositionHold){
                         ROS_INFO("Setpoint reset");
                         ChangeToBodyFrame();
                         PositionHold = false;
