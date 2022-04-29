@@ -150,7 +150,7 @@ void DroneControl::RunDrone(){
                 state = Landing;
             }
             
-            if(Floor_limit && (ReturnWaypoints.back()[2] < current_position.pose.pose.position.z)){
+            if( (Floor_limit || Roof_limit) && (ReturnWaypoints.back()[2] < current_position.pose.pose.position.z)){
                 if (ReturnWaypoints.size() > 6){
                         for(int i = 1; i < 5; i++){
                             ReturnWaypoints[ReturnWaypoints.size()-i][2] = current_position.pose.pose.position.z;
@@ -186,11 +186,12 @@ void DroneControl::RunDrone(){
                     AdjustHeight = current_position.pose.pose.position.z + RTHAvoidanceHeight;
                     RTHHeightAdjusted = true;
                 }
-                if (current_position.pose.pose.position.z < AdjustHeight){ // Go up to the new test height
+                if ((current_position.pose.pose.position.z < AdjustHeight) && !Roof_limit){ // Go up to the new test height
                     TargetPosition.velocity.x = 0;
                     TargetPosition.velocity.y = 0;
                     TargetPosition.velocity.z = 0.5;
                 } else { // When new height is reached increase height of next 12 waypoints so the drone goes forward at same height
+                    TargetPosition.velocity.z = 0;
                     RTHHeightAdjusted = false;
                     if (ReturnWaypoints.size() > 13){
                         for(int i = 1; i < 12; i++){
