@@ -61,7 +61,6 @@ void DroneControl::RunDrone(){
                 }
             break;
         case 2 /*Flying*/: // Get input from control-++ler and update Targetpotsiion
-                ChangeToBodyFrame();
                 TargetPosition = InputTargetPosition; // Input from controller
                 TargetPosition.velocity.x = TargetPosition.velocity.x + AvoidReverse; // Obstacle avoidance
                 TargetPosition.velocity.y = TargetPosition.velocity.y + AvoidRoll;    // Obstacle avoidance
@@ -75,6 +74,7 @@ void DroneControl::RunDrone(){
                     PositionHold = true;
                 } 
                 if (TargetPosition.velocity.x != 0 || TargetPosition.velocity.y != 0 || TargetPosition.yaw_rate != 0){
+                        ChangeToBodyFrame();
                         PositionHold = false;
                 }
                 
