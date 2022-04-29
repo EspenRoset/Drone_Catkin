@@ -111,6 +111,7 @@ void DroneControl::RunDrone(){
             break;
         case 5 /*Avoid Obstacle*/: // Limit movement to avoid crashing
                 // Get input from Controller
+
                 if (!PositionHold)
                 {
                 TargetPosition = InputTargetPosition;
@@ -233,7 +234,7 @@ void DroneControl::RunDrone(){
             AddWaypoint(0,0,0);
         }
         ROS_INFO("Frame: ");
-        ROS_INFO_STREAM(TargetPosition.coordinate_frame);
+        ROS_INFO_STREAM(Frame);
         ROS_INFO("Velocities: ");
         ROS_INFO_STREAM(TargetPosition.velocity.x);
         ROS_INFO_STREAM(TargetPosition.velocity.y);
@@ -399,6 +400,7 @@ float DroneControl::CalcYawRate(){
 
 void DroneControl::ChangeToBodyFrame(){ // Change to body frame when sending velocity setpoints
     TargetPosition.coordinate_frame = mavros_msgs::PositionTarget::FRAME_BODY_NED;
+    Frame = "Body";
     TargetPosition.type_mask = 1024; // Ingoring yaw angle, using yaw rate
     TargetPosition.position.x = 0;
     TargetPosition.position.y = 0;
@@ -407,6 +409,7 @@ void DroneControl::ChangeToBodyFrame(){ // Change to body frame when sending vel
 
 void DroneControl::ChangeToLocalFrame(){ // Change to Local(world) frame when sending position setpoints
     TargetPosition.coordinate_frame = mavros_msgs::PositionTarget::FRAME_LOCAL_NED;
+    Frame = "Local";
     TargetPosition.velocity.x = 0;
     TargetPosition.velocity.y = 0;
     TargetPosition.velocity.z = 0;
