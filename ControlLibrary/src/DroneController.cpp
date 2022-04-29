@@ -61,10 +61,23 @@ void DroneControl::RunDrone(){
                 }
             break;
         case 2 /*Flying*/: // Get input from control-++ler and update Targetpotsiion
+                ChangeToBodyFrame()
                 TargetPosition = InputTargetPosition; // Input from controller
                 TargetPosition.velocity.x = TargetPosition.velocity.x + AvoidReverse; // Obstacle avoidance
-                TargetPosition.velocity.y = TargetPosition.velocity.y + AvoidRoll;      // Obstacle avoidance
+                TargetPosition.velocity.y = TargetPosition.velocity.y + AvoidRoll;    // Obstacle avoidance
                 TargetPosition.yaw_rate = TargetPosition.yaw_rate + AvoidYawRate;
+                
+                if (TargetPosition.velocity.x == 0 && TargetPosition.velocity.y == 0 && TargetPosition.yaw_rate == 0 && !PositionHold){
+                    ChangeToLocalFrame();
+                    TargetPosition.position.x = current_position.pose.pose.position.x;
+                    TargetPosition.position.y = current_position.pose.pose.position.y;
+                    TargetPosition.position.z = current_position.pose.pose.position.z;
+                    PositionHold = true;
+                } 
+                if (TargetPosition.velocity.x != 0 || TargetPosition.velocity.y != 0 || TargetPosition.yaw_rate != 0){
+                        PositionHold = false;
+                }
+                
 
                 if (InitiateLanding){
                     state = Landing;
