@@ -63,12 +63,11 @@ void DroneControl::RunDrone(){
         case 2 /*Flying*/: // Get input from control-++ler and update Targetpotsiion
                 if (!PositionHold){
                 TargetPosition = InputTargetPosition; // Input from controller
-                }
                 TargetPosition.velocity.x = TargetPosition.velocity.x + AvoidReverse; // Obstacle avoidance
                 TargetPosition.velocity.y = TargetPosition.velocity.y + AvoidRoll;    // Obstacle avoidance
                 TargetPosition.yaw_rate = TargetPosition.yaw_rate + AvoidYawRate;
-                
-                if (InputTargetPosition.velocity.x == 0 && InputTargetPosition.velocity.y == 0 && InputTargetPosition.yaw_rate == 0 && !PositionHold){
+                }
+                if (InputTargetPosition.velocity.x == 0 && InputTargetPosition.velocity.y == 0 && InputTargetPosition.yaw_rate == 0 && InputTargetPosition.velocity.z == 0 && !PositionHold){
                     ChangeToLocalFrame();
                     ROS_INFO("Setpoint set");
                     TargetPosition.position.x = current_position.pose.pose.position.x;
@@ -76,7 +75,7 @@ void DroneControl::RunDrone(){
                     TargetPosition.position.z = current_position.pose.pose.position.z;
                     PositionHold = true;
                 } 
-                if ((InputTargetPosition.velocity.x != 0 || InputTargetPosition.velocity.y != 0 || InputTargetPosition.yaw_rate != 0) && PositionHold){
+                if ((InputTargetPosition.velocity.x != 0 || InputTargetPosition.velocity.y != 0 || InputTargetPosition.yaw_rate != 0 || InputTargetPosition.velocity.z != 0) && PositionHold){
                         ROS_INFO("Setpoint reset");
                         ChangeToBodyFrame();
                         PositionHold = false;
@@ -85,7 +84,7 @@ void DroneControl::RunDrone(){
 
                 if (InitiateLanding){
                     state = Landing;
-                } if (Roof_limit || Floor_limit){
+                } if ((Roof_limit || Floor_limit) && !PositionHold){
                     state = AvoidObstacle;
                 }
                 if (InitiateReturn){
@@ -112,10 +111,14 @@ void DroneControl::RunDrone(){
             break;
         case 5 /*Avoid Obstacle*/: // Limit movement to avoid crashing
                 // Get input from Controller
+                if (!PositionHold)
+                {
                 TargetPosition = InputTargetPosition;
                 TargetPosition.velocity.x = TargetPosition.velocity.x + AvoidReverse; // Obstacle avoidance
                 TargetPosition.velocity.y = TargetPosition.velocity.y + AvoidRoll;      // Obstacle avoidance
                 TargetPosition.yaw_rate = TargetPosition.yaw_rate + AvoidYawRate; //Obstacle avoidance
+                }
+
 
                 ROS_INFO_STREAM("Avoiding obstacle");
                 // Limit Movement
