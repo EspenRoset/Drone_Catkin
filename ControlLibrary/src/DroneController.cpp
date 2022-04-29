@@ -346,19 +346,23 @@ void DroneControl::AddWaypoint(float deltax, float deltay, float deltaz){
 
 float DroneControl::CalcYawRate(){
     TargetPosition.type_mask = 2048; // Ignoring yaw rate, using yaw angle
+    if (ReturnWaypoints.size() > 4)
+    {
+        float x2 = ReturnWaypoints[ReturnWaypoints.size()-3][0] - current_position.pose.pose.position.x; // Move objective point
+        float y2 = ReturnWaypoints[ReturnWaypoints.size()-3][1] - current_position.pose.pose.position.y;
+    
 
-    float x2 = ReturnWaypoints[ReturnWaypoints.size()-3][0] - current_position.pose.pose.position.x; // Move objective point
-    float y2 = ReturnWaypoints[ReturnWaypoints.size()-3][1] - current_position.pose.pose.position.y;
-   
 
-    float x1 = 1; //Reference Point
-    float y1 = 0; 
+        float x1 = 1; //Reference Point
+        float y1 = 0; 
 
-    float dot = x1*x2 + y1*y2;      // dot product between [x1, y1] and [x2, y2]
-    float det = x1*y2 - y1*x2;      // determinant
-    float angle = std::atan2(det, dot); //+3.14159265359;  // atan2(y, x) or atan2(sin, cos)
-    TargetPosition.yaw = angle;
-    return angle;
+        float dot = x1*x2 + y1*y2;      // dot product between [x1, y1] and [x2, y2]
+        float det = x1*y2 - y1*x2;      // determinant
+        float angle = std::atan2(det, dot); //+3.14159265359;  // atan2(y, x) or atan2(sin, cos)
+        TargetPosition.yaw = angle;
+        return angle;
+    }
+    return 0.0;
 }
 
 void DroneControl::ChangeToBodyFrame(){ // Change to body frame when sending velocity setpoints
@@ -405,13 +409,13 @@ void DroneControl::AdjustBubblesize(){
     
     //float AvoidScale = 0.5;
     if(((dot+0.75)/4)<0.2){
-        ReturnBubblesize = 0.2;
+        ReturnBubblesize = 0.16;
     } else{
         ReturnBubblesize = (dot+0.75)/4;
     }
     
 } else{
-    ReturnBubblesize = 0.2;
+    ReturnBubblesize = 0.16;
     }
     ROS_INFO("Bubblesize: ");
     ROS_INFO_STREAM(ReturnBubblesize);
