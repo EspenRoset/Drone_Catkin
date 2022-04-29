@@ -347,10 +347,9 @@ void DroneControl::AddWaypoint(float deltax, float deltay, float deltaz){
 float DroneControl::CalcYawRate(){
     TargetPosition.type_mask = 2048; // Ignoring yaw rate, using yaw angle
 
-    float x2 = ReturnWaypoints.back()[0] - current_position.pose.pose.position.x; // Move objective point
-    float y2 = ReturnWaypoints.back()[1] - current_position.pose.pose.position.y;
+    float x2 = ReturnWaypoints[ReturnWaypoints.size()-3][0] - current_position.pose.pose.position.x; // Move objective point
+    float y2 = ReturnWaypoints[ReturnWaypoints.size()-3][1] - current_position.pose.pose.position.y;
    
-    
 
     float x1 = 1; //Reference Point
     float y1 = 0; 
@@ -406,13 +405,13 @@ void DroneControl::AdjustBubblesize(){
     
     //float AvoidScale = 0.5;
     if(((dot+1.3)/4)<0.2){
-        ReturnBubblesize = 0.25;
+        ReturnBubblesize = 0.15;
     } else{
         ReturnBubblesize = (dot+1.3)/4;
     }
     
 } else{
-    ReturnBubblesize = 0.25;
+    ReturnBubblesize = 0.15;
     }
     ROS_INFO("Bubblesize: ");
     ROS_INFO_STREAM(ReturnBubblesize);
