@@ -10,7 +10,7 @@ ToF.set_distance_mode(2)
 def GetDistance():
     pub = rospy.Publisher('distance_up', String, queue_size=10)
     rospy.init_node('VL53L1X', anonymous=True)
-    rate = rospy.Rate(5)
+    rate = rospy.Rate(15)
     while not rospy.is_shutdown():
         try:
             ToF.start_ranging()  # Write configuration bytes to initiate measurement
@@ -18,10 +18,10 @@ def GetDistance():
             distance = ToF.get_distance()  # Get the result of the measurement from the sensor
             time.sleep(.005)
             ToF.stop_ranging()
-            print(ToF.get_range_status())
 
             #rospy.loginfo(str(distance))
-            pub.publish(str(distance))
+            if ToF.get_range_status() == 0:
+                pub.publish(str(distance))
             rate.sleep()
 
         except Exception as e:
