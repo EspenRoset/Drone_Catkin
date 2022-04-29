@@ -19,9 +19,9 @@ void DroneControl::pose_cb(const nav_msgs::Odometry::ConstPtr& msg){
 void DroneControl::collision_cb(const std_msgs::Float32MultiArray::ConstPtr& msg){
     //Obstacle_detected = static_cast<int>(msg->data[2]);
     Roof_limit = static_cast<int>(msg->data[2]);
-    if(Roof_limit){ROS_INFO("Roof limit")}; 
+    if(Roof_limit){ROS_INFO("Roof limit");}; 
     Floor_limit = static_cast<int>(msg->data[3]);
-    if(Floor_limit){ROS_INFO("Floor limit")};
+    if(Floor_limit){ROS_INFO("Floor limit");};
     AvoidReverse = msg->data[0];
     AvoidRoll = msg->data[1]; // Negativ = Høgre, Positiv = Venstre 
     AvoidYawRate = msg->data[4]; // Positiv = med klokka, negativ = mot klokka 

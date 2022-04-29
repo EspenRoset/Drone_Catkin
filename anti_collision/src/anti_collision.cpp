@@ -121,12 +121,13 @@ void analysis::Calibration(const sensor_msgs::ImageConstPtr& msg){
 
 void analysis::verticalCheck(std::vector<float>& data)
 {
-    if (sensorUp>minDistRoof){
+    if (sensorUp>minDistRoof || sensorUp==0){
         data[2] = 0; // Distance form roof is SAFE
     }else{
         data[2] = 1; // Distance from roof is NOT SAFE
     }
-    if (sensorDown>minAltitude){
+
+    if (sensorDown>minAltitude || sensorDown==0){
         data[3] = 0; // Distance from floor is SAFE
     }else{
         data[3] = 1; // Distance from floor is too low, recommend increased altitude

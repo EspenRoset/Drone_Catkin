@@ -56,6 +56,7 @@ class analysis
 
     // Param Safety
     float minDistRoof = 1500; // Minimum distance above drone  (mm)
+    int roofCount = 0; // For filtering bad data from sensor
     float minAltitude = 500;  // Minimum distance bellow drone (mm)
     float depth_thresh = 160;  // Threshold for SAFE distance (cm)
     float depth_min = 30; // Threshold for closest distance estimated (cm)

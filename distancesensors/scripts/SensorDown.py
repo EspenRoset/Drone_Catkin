@@ -23,7 +23,10 @@ def GetDistance():
             ToF.stop_ranging()
 
             #rospy.loginfo(str(distance))
-            pub.publish(str(distance))
+            if ToF.get_range_status() == 0:
+                pub.publish(str(distance))
+            else:
+                pub.publish("0")
             rate.sleep()
 
         except Exception as e:
