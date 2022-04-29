@@ -5,7 +5,7 @@ import time
 
 ToF = qwiic.QwiicVL53L1X(41, BusId=0)
 ToF.sensor_init()
-ToF.set_distance_mode(2)
+ToF.set_distance_mode(1)
 
 def GetDistance():
     pub = rospy.Publisher('distance_up', String, queue_size=10)
