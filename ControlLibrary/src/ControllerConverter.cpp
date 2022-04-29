@@ -63,6 +63,17 @@ void ControllerConverter::UpdateVelocities(){
         ControllerConverter::Target.velocity.x = Vx_*Vmultiplier;
         ControllerConverter::Target.velocity.z = Vz_*Vmultiplier;
         ControllerConverter::Target.yaw_rate = Yaw_*Vmultiplier;
+
+        if (abs(ControllerConverter::Target.velocity.x) < 0.05){
+            ControllerConverter::Target.velocity.x = 0;
+        }
+        if (abs(ControllerConverter::Target.velocity.z) < 0.05){
+            ControllerConverter::Target.velocity.z = 0;
+        }
+        if (abs(ControllerConverter::Target.velocity.yaw_rate) < 0.05){
+            ControllerConverter::Target.velocity.yaw_rate = 0;
+        }
+        
         rate_->sleep();
     }
 }
