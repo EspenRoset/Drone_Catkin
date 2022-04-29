@@ -68,12 +68,14 @@ void DroneControl::RunDrone(){
                 
                 if (TargetPosition.velocity.x == 0 && TargetPosition.velocity.y == 0 && TargetPosition.yaw_rate == 0 && !PositionHold){
                     ChangeToLocalFrame();
+                    ROS_INFO("Setpoint set");
                     TargetPosition.position.x = current_position.pose.pose.position.x;
                     TargetPosition.position.y = current_position.pose.pose.position.y;
                     TargetPosition.position.z = current_position.pose.pose.position.z;
                     PositionHold = true;
                 } 
-                if (TargetPosition.velocity.x != 0 || TargetPosition.velocity.y != 0 || TargetPosition.yaw_rate != 0){
+                if ((TargetPosition.velocity.x != 0 || TargetPosition.velocity.y != 0 || TargetPosition.yaw_rate != 0) && PositionHold){
+                        ROS_INFO("Setpoint reset");
                         ChangeToBodyFrame();
                         PositionHold = false;
                 }
