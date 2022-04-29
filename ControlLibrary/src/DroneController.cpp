@@ -133,6 +133,7 @@ void DroneControl::RunDrone(){
                 ROS_INFO_STREAM("Going to the next waypoint");
                 ReturnWaypoints.pop_back();
             }
+
             TargetPosition.position.x = ReturnWaypoints.back()[0];
             TargetPosition.position.y = ReturnWaypoints.back()[1];
             TargetPosition.position.z = ReturnWaypoints.back()[2];    
@@ -148,6 +149,15 @@ void DroneControl::RunDrone(){
                 ChangeToBodyFrame();
                 state = Landing;
             }
+            
+            if(Floor_limit && (ReturnWaypoints.back()[2] < current_position.pose.pose.position.z)){
+                if (ReturnWaypoints.size() > 6){
+                        for(int i = 1; i < 5; i++){
+                            ReturnWaypoints[ReturnWaypoints.size()-i][2] = current_position.pose.pose.position.z;
+                        }
+                    }
+            }
+
             if (InitiateTakeoff){
                 InitiateReturn = false;
                 InitiateTakeoff = false;
@@ -172,45 +182,31 @@ void DroneControl::RunDrone(){
 
             } else {
 
-                if (!RTHHeightAdjusted){
+                if (!RTHHeightAdjusted){ // When done reversing set a new height to test at once
                     AdjustHeight = current_position.pose.pose.position.z + RTHAvoidanceHeight;
                     RTHHeightAdjusted = true;
                 }
-                if (current_position.pose.pose.position.z < AdjustHeight){ // Go up 1 m
+                if (current_position.pose.pose.position.z < AdjustHeight){ // Go up to the new test height
                     TargetPosition.velocity.x = 0;
                     TargetPosition.velocity.y = 0;
                     TargetPosition.velocity.z = 0.5;
-                } else {
+                } else { // When new height is reached increase height of next 12 waypoints so the drone goes forward at same height
                     RTHHeightAdjusted = false;
                     if (ReturnWaypoints.size() > 13){
                         for(int i = 1; i < 12; i++){
                             ReturnWaypoints[ReturnWaypoints.size()-i][2] = current_position.pose.pose.position.z;
                         }
                     }
-                    state = ReturnHome;
+                    state = ReturnHome; // Change state to go to the adjustedwaypoints
                 }
-
-                /*
-                ROS_INFO("Increasing height maybe ? :/");
-                RTHHeightAdjusted = true;
-                ReturnWaypoints.back()[2] += 1; // Adjust waypoint up
-                AddWaypoint(0,0,1); // Move drone up
-                WaypointAdjusted = false;
-                state=ReturnHome; 
-                */
-            }
-            // 1 - Stop drone
-            // 2 - Yaw to check safety in opposite direction of obstacle
-            // 3 - If safe then set a new waypoiny away from obstacle
-            // 3.1 - Go to new waypoint
-            // 4 - If not safe then 
-            // 5 - Resume RTH 
+            } 
             break;
         default: // Maybe do something
             break;
         }
         
         if((state != ReturnHome) && !check_position(ReturnWaypoints.back(), 0.1) && (state != ReturnHomeAvoidance)){
+            // Log positions at set interval(0.1) if state is not ReturnHome or ReturnHomeAvoidance
             AddWaypoint(0,0,0);
         }
         pos_pub.publish(TargetPosition);
