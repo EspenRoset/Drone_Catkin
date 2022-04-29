@@ -71,7 +71,7 @@ void ControllerConverter::UpdateVelocities(){
             ControllerConverter::Target.velocity.z = 0;
         }
         if (abs(ControllerConverter::Target.velocity.yaw_rate) < 0.05){
-            ControllerConverter::Target.velocity.yaw_rate = 0;
+            ControllerConverter::Target.yaw_rate = 0;
         }
         
         rate_->sleep();
