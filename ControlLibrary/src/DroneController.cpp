@@ -49,6 +49,7 @@ void DroneControl::RunDrone(){
                 //DroneControl::PX4Arm();
                 ResetWaypoints();
                 AddWaypoint(0,0,0);
+                AddWaypoint(0,0,0.75);
 
                 StartingHeight = current_position.pose.pose.position.z; //Reference height used for calcing takeoff height
                 ROS_INFO_STREAM("Waiting for Takeoff command (Rb + A)");
