@@ -234,6 +234,7 @@ void DroneControl::RunDrone(){
             // Log positions at set interval(0.1) if state is not ReturnHome or ReturnHomeAvoidance
             AddWaypoint(0,0,0);
         }
+        /*
         ROS_INFO("Frame: ");
         ROS_INFO_STREAM(Frame);
         ROS_INFO("Velocities: ");
@@ -244,6 +245,7 @@ void DroneControl::RunDrone(){
         ROS_INFO_STREAM(TargetPosition.position.x);
         ROS_INFO_STREAM(TargetPosition.position.y);
         ROS_INFO_STREAM(TargetPosition.position.z);
+        */
         
 
         pos_pub.publish(TargetPosition);
